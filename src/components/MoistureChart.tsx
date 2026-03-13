@@ -26,7 +26,7 @@ export const MoistureChart: React.FC<MoistureChartProps> = ({ readings }) => {
 
   if (readings.length === 0) {
     return (
-      <div className="h-[300px] w-full flex items-center justify-center text-rose-300/20 font-medium italic">
+      <div className="h-[300px] w-full flex items-center justify-center text-maroon-300/20 font-medium italic">
         No historical data available yet
       </div>
     );

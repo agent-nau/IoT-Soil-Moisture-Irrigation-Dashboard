@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { auth } from '../firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { Droplets, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { Droplets, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export const Login: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Convert username to fake email for Firebase auth
+  const usernameToEmail = (name: string) => `${name.toLowerCase().trim()}@moisture.local`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,11 +20,11 @@ export const Login: React.FC = () => {
     setError(null);
 
     try {
+      const email = usernameToEmail(username);
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
       } else {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await updateProfile(userCredential.user, { displayName });
+        await createUserWithEmailAndPassword(auth, email, password);
       }
     } catch (err: any) {
       console.error(err);
@@ -33,103 +35,115 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-rose-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-maroon-950 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gold-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gold-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-maroon-800/20 rounded-full blur-3xl"></div>
+      </div>
+      
+      {/* Grid pattern overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(120,53,15,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(120,53,15,0.1)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md bg-rose-900/20 backdrop-blur-xl border border-rose-800/30 rounded-3xl p-8 shadow-2xl"
+        className="w-full max-w-md relative"
       >
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center mb-6 shadow-xl shadow-amber-500/10 border border-rose-800/30 overflow-hidden p-2">
-            <img 
-              src="/liceo.png" 
-              alt="Liceo Logo" 
-              className="w-full h-full object-contain"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-          <h1 className="text-2xl font-bold text-amber-50">Liceo Moisture Monitor</h1>
-          <p className="text-rose-300/60 text-sm mt-2">Soil Moisture Detection System</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <div className="space-y-1">
-              <label className="text-xs font-bold uppercase tracking-widest text-rose-400 ml-1">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-rose-400" size={18} />
-                <input
-                  type="text"
-                  required
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full bg-rose-950/50 border border-rose-800/50 rounded-xl py-3 pl-10 pr-4 text-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all"
-                  placeholder="John Doe"
+        {/* Main card */}
+        <div className="bg-gradient-to-br from-maroon-900 via-maroon-800 to-maroon-900 border border-gold-500/30 rounded-3xl p-8 shadow-2xl shadow-black/50">
+          {/* Gold accent line */}
+          <div className="h-1 w-20 bg-gradient-to-r from-gold-400 to-gold-600 rounded-full mx-auto mb-6"></div>
+          
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-28 h-28 bg-gradient-to-br from-gold-400 to-gold-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-gold-500/30 border-2 border-gold-300/50 p-1">
+              <div className="w-full h-full bg-white rounded-xl flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/liceo.png" 
+                  alt="Liceo Logo" 
+                  className="w-20 h-20 object-contain"
+                  referrerPolicy="no-referrer"
                 />
               </div>
             </div>
-          )}
-
-          <div className="space-y-1">
-            <label className="text-xs font-bold uppercase tracking-widest text-rose-400 ml-1">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-rose-400" size={18} />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-rose-950/50 border border-rose-800/50 rounded-xl py-3 pl-10 pr-4 text-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all"
-                placeholder="you@example.com"
-              />
-            </div>
+            <h1 className="text-3xl font-bold text-gold-400 tracking-tight">Liceo Moisture</h1>
+            <p className="text-gold-200/70 text-sm mt-1">Soil Moisture Detection System</p>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-bold uppercase tracking-widest text-rose-400 ml-1">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-rose-400" size={18} />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-rose-950/50 border border-rose-800/50 rounded-xl py-3 pl-10 pr-4 text-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all"
-                placeholder="••••••••"
-              />
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-gold-400 ml-1">Username</label>
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-gold-500 to-amber-600 rounded-xl blur opacity-0 group-focus-within:opacity-30 transition-opacity duration-300"></div>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400" size={20} />
+                  <input
+                    type="text"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-3 pl-11 pr-4 text-gold-50 placeholder:text-gold-500/50 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500/50 transition-all"
+                    placeholder="Enter your username"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
 
-          {error && (
-            <div className="p-3 bg-red-950/30 border border-red-900/50 rounded-xl text-red-200 text-xs">
-              {error}
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-widest text-gold-400 ml-1">Password</label>
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-gold-500 to-amber-600 rounded-xl blur opacity-0 group-focus-within:opacity-30 transition-opacity duration-300"></div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400" size={20} />
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-3 pl-11 pr-4 text-gold-50 placeholder:text-gold-500/50 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500/50 transition-all"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-rose-950 font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
-          >
-            {loading ? (
-              <Loader2 className="animate-spin" size={20} />
-            ) : (
-              <>
-                {isLogin ? 'Sign In' : 'Create Account'}
-                <ArrowRight size={20} />
-              </>
+            {error && (
+              <div className="p-3 bg-red-950/50 border border-red-800/50 rounded-xl text-red-200 text-sm text-center">
+                {error}
+              </div>
             )}
-          </button>
-        </form>
 
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-rose-300 hover:text-amber-400 text-sm font-medium transition-colors"
-          >
-            {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
-          </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 hover:from-gold-400 hover:via-gold-300 hover:to-gold-400 disabled:opacity-50 text-maroon-950 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold-500/30 hover:shadow-gold-500/50"
+            >
+              {loading ? (
+                <Loader2 className="animate-spin" size={22} />
+              ) : (
+                <>
+                  {isLogin ? 'Sign In' : 'Create Account'}
+                  <ArrowRight size={22} />
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-gold-300 hover:text-gold-100 text-sm font-medium transition-colors underline underline-offset-4"
+            >
+              {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
+            </button>
+          </div>
         </div>
+        
+        {/* Footer text */}
+        <p className="text-center text-maroon-400/50 text-xs mt-6">
+          © 2026 Liceo Moisture Monitor. All rights reserved.
+        </p>
       </motion.div>
     </div>
   );
