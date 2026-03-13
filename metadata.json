@@ -1,0 +1,5 @@
+{
+  "name": "Soil Moisture Detector!",
+  "description": "A minimalist dashboard for monitoring soil moisture levels from Google Sheets data with real-time updates.",
+  "requestFramePermissions": []
+}
