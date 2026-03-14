@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, LayoutDashboard, Settings, Bell, Search, Plus, Info, Battery, Signal, Thermometer, LogOut, Github } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Settings, Bell, Search, Plus, Info, Battery, Signal, Thermometer, LogOut, Github, Edit2, Check } from 'lucide-react';
 import { SensorData, SensorReading } from './types';
 import { fetchSheetData } from './services/googleSheetsService';
 import { fetchSupabaseData } from './services/supabaseService';
@@ -36,6 +36,8 @@ function AppContent() {
   const [monitorName, setMonitorName] = useState<string | null>(localStorage.getItem('monitor_name'));
   const [customSheetId, setCustomSheetId] = useState<string | null>(localStorage.getItem('customSheetId'));
   const [isSetupOpen, setIsSetupOpen] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState('');
   const navigate = useNavigate();
 
   const sheetId = customSheetId || import.meta.env.VITE_GOOGLE_SHEET_ID || DEFAULT_SHEET_ID;
@@ -116,6 +118,7 @@ function AppContent() {
       setUser(currentUser);
       if (currentUser) {
         setMonitorName(currentUser.user_metadata?.monitor_name || null);
+        setCustomSheetId(currentUser.user_metadata?.custom_sheet_id || null);
       }
       setAuthLoading(false);
       
@@ -130,6 +133,7 @@ function AppContent() {
       setUser(currentUser);
       if (currentUser) {
         setMonitorName(currentUser.user_metadata?.monitor_name || null);
+        setCustomSheetId(currentUser.user_metadata?.custom_sheet_id || null);
       }
     });
 
@@ -144,7 +148,7 @@ function AppContent() {
     }
   }, [loadData, user, sharedSensorId]);
 
-  const handleSetMonitorName = async (name: string) => {
+  const handleSetMonitorName = async (name: string, shouldOpenSetup = true) => {
     try {
       const { error } = await supabase.auth.updateUser({
         data: { monitor_name: name }
@@ -152,20 +156,35 @@ function AppContent() {
       if (error) throw error;
       
       setMonitorName(name);
-      localStorage.setItem('monitorName', name);
-      setIsSetupOpen(true);
+      localStorage.setItem('monitor_name', name);
+      if (shouldOpenSetup) setIsSetupOpen(true);
+      setIsEditingName(false);
     } catch (err) {
       console.error('Error saving monitor name:', err);
-      // Fallback to local state if Supabase update fails
       setMonitorName(name);
-      localStorage.setItem('monitorName', name);
+      localStorage.setItem('monitor_name', name);
+      setIsEditingName(false);
     }
   };
 
-  const handleAddSensor = (id: string) => {
-    localStorage.setItem('customSheetId', id);
-    setCustomSheetId(id);
-    loadData();
+  const handleAddSensor = async (id: string) => {
+    try {
+      if (user) {
+        const { error } = await supabase.auth.updateUser({
+          data: { custom_sheet_id: id }
+        });
+        if (error) throw error;
+      }
+      
+      localStorage.setItem('customSheetId', id);
+      setCustomSheetId(id);
+      loadData();
+    } catch (err) {
+      console.error('Error saving sheet ID:', err);
+      localStorage.setItem('customSheetId', id);
+      setCustomSheetId(id);
+      loadData();
+    }
   };
 
   const handleSignOut = async () => {
@@ -268,9 +287,42 @@ function AppContent() {
               />
             </div>
             <div className="flex flex-col">
-              <h1 className="font-bold text-lg tracking-tight text-gold-50 leading-none">
-                {monitorName || 'LDCU Soil Moisture'}
-              </h1>
+              {isEditingName ? (
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (tempName.trim()) handleSetMonitorName(tempName.trim(), false);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <input 
+                    autoFocus
+                    value={tempName}
+                    onChange={(e) => setTempName(e.target.value)}
+                    className="bg-maroon-950/50 border border-gold-500/30 rounded px-2 py-0.5 text-sm text-gold-50 focus:outline-none focus:ring-1 focus:ring-gold-500/50 w-32"
+                  />
+                  <button type="submit" className="text-emerald-400 hover:text-emerald-300">
+                    <Check size={16} />
+                  </button>
+                </form>
+              ) : (
+                <div className="flex items-center gap-2 group">
+                  <h1 className="font-bold text-lg tracking-tight text-gold-50 leading-none">
+                    {monitorName || 'LDCU Soil Moisture'}
+                  </h1>
+                  {user && (
+                    <button 
+                      onClick={() => {
+                        setTempName(monitorName || '');
+                        setIsEditingName(true);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-maroon-400 hover:text-gold-400"
+                    >
+                      <Edit2 size={12} />
+                    </button>
+                  )}
+                </div>
+              )}
               <span className="text-[10px] text-maroon-300 font-bold uppercase tracking-widest mt-1">Detector System</span>
             </div>
           </div>

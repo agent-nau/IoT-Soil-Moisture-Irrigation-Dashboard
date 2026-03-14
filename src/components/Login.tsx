@@ -8,9 +8,6 @@ interface LoginProps {
 }
 
 export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shareCode, setShareCode] = useState('');
@@ -26,26 +23,6 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
     }
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-      }
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'An error occurred during authentication');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -115,6 +92,65 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
           </div>
 
           <div className="space-y-6">
+            {!supabaseConfigured && (
+              <div className="p-3 bg-gold-900/30 border border-gold-500/30 rounded-xl text-gold-200 text-sm text-center">
+                ⚠️ Supabase not configured. Add <code className="font-mono text-gold-400">VITE_SUPABASE_URL</code> and <code className="font-mono text-gold-400">VITE_SUPABASE_ANON_KEY</code> to your <code className="font-mono text-gold-400">.env</code> file.
+              </div>
+            )}
+
+            {localStorage.getItem('sharedSensorId') && (
+              <button
+                type="button"
+                onClick={() => onSharedAccess && onSharedAccess(localStorage.getItem('sharedSensorId')!)}
+                className="w-full bg-gold-500/5 hover:bg-gold-500/10 text-gold-400 font-bold py-4 rounded-xl border border-gold-500/20 transition-all flex items-center justify-center gap-2 group"
+              >
+                <LayoutDashboard size={18} className="group-hover:scale-110 transition-transform" />
+                <span>Continue as Guest</span>
+              </button>
+            )}
+
+            <form onSubmit={handleShareCodeAccess} className="space-y-4">
+              <div className="flex items-center gap-2 text-gold-400 text-[10px] font-bold uppercase tracking-widest ml-1">
+                <Lock size={12} />
+                <span>Monitor with Code</span>
+              </div>
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gold-500 rounded-xl blur opacity-0 group-focus-within:opacity-10 transition-opacity"></div>
+                <input
+                  type="text"
+                  required
+                  value={shareCode}
+                  onChange={(e) => setShareCode(e.target.value)}
+                  className="w-full bg-maroon-950/50 border border-gold-500/30 rounded-xl py-3 px-4 text-gold-50 placeholder:text-gold-500/20 focus:outline-none focus:ring-1 focus:ring-gold-500/30 transition-all font-sans text-sm"
+                  placeholder="Enter share code here"
+                />
+              </div>
+
+              {error && (
+                <div className="p-3 bg-red-950/30 border border-red-800/30 rounded-xl text-red-200 text-xs text-center">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-4 bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 hover:text-white font-bold rounded-xl border border-gold-500/20 transition-all flex items-center justify-center gap-2"
+              >
+                Monitor Sensor
+                <ArrowRight size={18} />
+              </button>
+            </form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gold-500/10"></div>
+              </div>
+              <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest text-gold-500/40">
+                <span className="bg-maroon-900 px-2">Owner Access</span>
+              </div>
+            </div>
+
             <button
               type="button"
               disabled={loading || !supabaseConfigured}
@@ -123,135 +159,7 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
               title="Sign in with Google"
             >
               <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-              <span className="text-sm font-bold">Sign in with Google</span>
-            </button>
-
-            {localStorage.getItem('sharedSensorId') && (
-               <button
-                 type="button"
-                 onClick={() => onSharedAccess(localStorage.getItem('sharedSensorId')!)}
-                 className="w-full bg-transparent hover:bg-gold-500/5 text-gold-400/80 hover:text-gold-400 font-bold py-3 rounded-xl border border-gold-500/10 hover:border-gold-500/30 transition-all flex items-center justify-center gap-2 group mb-2"
-               >
-                 <LayoutDashboard size={16} className="group-hover:scale-110 transition-transform opacity-70" />
-                 <span className="text-xs uppercase tracking-wider">Continue as Guest</span>
-               </button>
-            )}
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gold-500/10"></div>
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-maroon-900 px-2 text-gold-500/40 font-bold tracking-widest">Or use account</span>
-              </div>
-            </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {!supabaseConfigured && (
-              <div className="p-3 bg-gold-900/30 border border-gold-500/30 rounded-xl text-gold-200 text-sm text-center">
-                ⚠️ Supabase not configured. Add <code className="font-mono text-gold-400">VITE_SUPABASE_URL</code> and <code className="font-mono text-gold-400">VITE_SUPABASE_ANON_KEY</code> to your <code className="font-mono text-gold-400">.env</code> file.
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-gold-400 ml-1">Email</label>
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-gold-500 to-amber-600 rounded-xl blur opacity-0 group-focus-within:opacity-30 transition-opacity duration-300"></div>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400" size={20} />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-3 pl-11 pr-4 text-gold-50 placeholder:text-gold-500/50 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500/50 transition-all font-sans"
-                    placeholder="Enter your email"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-gold-400 ml-1">Password</label>
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-gold-500 to-amber-600 rounded-xl blur opacity-0 group-focus-within:opacity-30 transition-opacity duration-300"></div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400" size={20} />
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-3 pl-11 pr-4 text-gold-50 placeholder:text-gold-500/50 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500/50 transition-all font-sans"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {error && (
-              <div className="p-3 bg-red-950/50 border border-red-800/50 rounded-xl text-red-200 text-sm text-center">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 hover:from-gold-400 hover:via-gold-300 hover:to-gold-400 disabled:opacity-50 text-maroon-950 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold-500/30 hover:shadow-gold-500/50"
-            >
-              {loading ? (
-                <Loader2 className="animate-spin" size={22} />
-              ) : (
-                <>
-                  {isLogin ? 'Sign In' : 'Create Account'}
-                  <ArrowRight size={22} />
-                </>
-              )}
-            </button>
-          </form>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gold-500/10"></div>
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-maroon-900 px-2 text-gold-500/40 font-bold tracking-widest">Or monitor as guest</span>
-              </div>
-            </div>
-
-            <form onSubmit={handleShareCodeAccess} className="space-y-4">
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gold-500 rounded-xl blur opacity-0 group-focus-within:opacity-10 transition-opacity"></div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400/40" size={20} />
-                  <input
-                    type="text"
-                    required
-                    value={shareCode}
-                    onChange={(e) => setShareCode(e.target.value)}
-                    className="w-full bg-maroon-950/50 border border-gold-500/20 rounded-xl py-3 pl-11 pr-4 text-gold-50 placeholder:text-gold-500/20 focus:outline-none focus:ring-1 focus:ring-gold-500/30 transition-all font-sans text-sm"
-                    placeholder="Enter share code"
-                  />
-                </div>
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 text-gold-400 hover:text-white font-bold transition-all flex items-center justify-center gap-2"
-              >
-                Monitor Sensor
-                <ArrowRight size={18} />
-              </button>
-            </form>
-          </div>
-          
-          <div className="mt-8 text-center">
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-gold-300 hover:text-gold-100 text-sm font-medium transition-colors underline underline-offset-4"
-            >
-              {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
+              <span className="text-sm font-bold">Log in with Google</span>
             </button>
           </div>
           
