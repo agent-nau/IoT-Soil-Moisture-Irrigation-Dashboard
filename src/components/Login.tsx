@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import { supabase, supabaseConfigured } from '../supabase';
-import { Droplets, Lock, Mail, ArrowRight, Loader2, Github, Phone, Smartphone } from 'lucide-react';
+import { Droplets, Lock, Mail, ArrowRight, Loader2, Github } from 'lucide-react';
 import { motion } from 'motion/react';
 
-export const Login: React.FC = () => {
+interface LoginProps {
+  onSharedAccess?: (code: string) => void;
+}
+
+export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [shareCode, setShareCode] = useState('');
 
   // Clear URL error parameters on load
   React.useEffect(() => {
@@ -63,47 +68,20 @@ export const Login: React.FC = () => {
       setLoading(false);
     }
   };
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [showOtp, setShowOtp] = useState(false);
 
-  const handlePhoneLogin = async (e: React.FormEvent) => {
+
+  const handleShareCodeAccess = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: phone.startsWith('+') ? phone : `+${phone}`,
-      });
-      if (error) throw error;
-      setShowOtp(true);
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'An error occurred during phone login');
-    } finally {
-      setLoading(false);
+    if (!shareCode.trim()) {
+      setError('Please enter a valid share code');
+      return;
+    }
+    
+    localStorage.setItem('sharedSensorId', shareCode.trim());
+    if (onSharedAccess) {
+      onSharedAccess(shareCode.trim());
     }
   };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: phone.startsWith('+') ? phone : `+${phone}`,
-        token: otp,
-        type: 'sms',
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'An error occurred during OTP verification');
-    } finally {
-      setLoading(false);
-    }
-  };
-
 
   return (
     <div className="min-h-screen bg-maroon-950 flex items-center justify-center p-4 relative overflow-hidden">
@@ -207,60 +185,34 @@ export const Login: React.FC = () => {
               <div className="w-full border-t border-gold-500/20"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-maroon-900 px-2 text-gold-500/50 font-bold tracking-widest">Or login with Phone</span>
+              <span className="bg-maroon-900 px-2 text-gold-500/50 font-bold tracking-widest">Or monitor with code</span>
             </div>
           </div>
 
-          {!showOtp ? (
-            <form onSubmit={handlePhoneLogin} className="space-y-4">
-              <div className="relative group">
-                <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400" size={20} />
-                <input
-                  type="tel"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-3 pl-11 pr-4 text-gold-50 placeholder:text-gold-500/50 focus:outline-none focus:ring-2 focus:ring-gold-500/50 transition-all font-sans"
-                  placeholder="+1234567890"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-maroon-800 hover:bg-maroon-700 text-gold-400 font-bold py-3 rounded-xl transition-all border border-gold-500/20"
-              >
-                Send SMS Code
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="relative group">
+          <form onSubmit={handleShareCodeAccess} className="space-y-4">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-gold-500 to-amber-600 rounded-xl blur opacity-0 group-focus-within:opacity-30 transition-opacity duration-300"></div>
+              <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400" size={20} />
                 <input
                   type="text"
                   required
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
+                  value={shareCode}
+                  onChange={(e) => setShareCode(e.target.value)}
                   className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-3 pl-11 pr-4 text-gold-50 placeholder:text-gold-500/50 focus:outline-none focus:ring-2 focus:ring-gold-500/50 transition-all font-sans"
-                  placeholder="Enter 6-digit code"
+                  placeholder="Paste share code here"
                 />
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gold-500 hover:bg-gold-400 text-maroon-950 font-bold py-3 rounded-xl transition-all"
-              >
-                Verify Code
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setShowOtp(false)}
-                className="w-full text-xs text-maroon-400 hover:text-gold-400 transition-colors"
-              >
-                Change Phone Number
-              </button>
-            </form>
-          )}
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-maroon-800 hover:bg-maroon-700 text-gold-400 font-bold py-3 rounded-xl transition-all border border-gold-500/20 flex items-center justify-center gap-2"
+            >
+              Monitor Sensor
+              <ArrowRight size={18} />
+            </button>
+          </form>
 
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">

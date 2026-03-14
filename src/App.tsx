@@ -25,6 +25,7 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
+  const [sharedSensorId, setSharedSensorId] = useState<string | null>(localStorage.getItem('sharedSensorId'));
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -42,6 +43,11 @@ function AppContent() {
 
       // Fetch from Supabase Database
       supabaseReadings = await fetchSupabaseData();
+
+      // Filter by shared sensor if in guest mode
+      if (sharedSensorId && supabaseReadings.length > 0) {
+        supabaseReadings = supabaseReadings.filter(r => r.sensorId === sharedSensorId);
+      }
 
       // Merge and deduplicate readings
       const readings = [...sheetReadings, ...supabaseReadings].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
@@ -93,7 +99,7 @@ function AppContent() {
       setLoading(false);
       setLastRefresh(new Date());
     }
-  }, [sheetId, selectedSensorId]);
+  }, [sheetId, selectedSensorId, sharedSensorId]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -115,12 +121,12 @@ function AppContent() {
   }, [navigate]);
 
   useEffect(() => {
-    if (user) {
+    if (user || sharedSensorId) {
       loadData();
       const interval = setInterval(loadData, 30000);
       return () => clearInterval(interval);
     }
-  }, [loadData, user]);
+  }, [loadData, user, sharedSensorId]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -139,7 +145,7 @@ function AppContent() {
       <Route 
         path="/" 
         element={
-          !user ? <Login /> : (
+          (!user && !sharedSensorId) ? <Login onSharedAccess={(code) => setSharedSensorId(code)} /> : (
             <div className="min-h-screen bg-maroon-950 text-gold-50 font-sans">
               <SetupModal isOpen={isSetupOpen} onClose={() => setIsSetupOpen(false)} />
               
@@ -172,23 +178,33 @@ function AppContent() {
                       <span className="hidden md:inline text-xs font-bold uppercase tracking-widest">Setup</span>
                     </button>
                     <button 
-                      onClick={handleSignOut}
+                      onClick={user ? handleSignOut : () => {
+                        localStorage.removeItem('sharedSensorId');
+                        setSharedSensorId(null);
+                      }}
                       className="p-2 text-maroon-300 hover:text-red-400 transition-colors flex items-center gap-2"
-                      title="Sign Out"
+                      title={user ? "Sign Out" : "Exit Monitor"}
                     >
                       <LogOut size={20} />
                     </button>
-                  <button 
-                    onClick={() => navigate('/profile')}
-                    className="w-8 h-8 rounded-full bg-maroon-800 border border-maroon-700 shadow-sm overflow-hidden hover:ring-2 hover:ring-gold-500 transition-all flex items-center justify-center p-0"
-                  >
-                    <img 
-                      src={user.user_metadata?.avatar_url || user.user_metadata?.picture || `https://ui-avatars.com/api/?name=${user.email}&background=fbbf24&color=4c0519`} 
-                      alt="Avatar" 
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer" 
-                    />
-                  </button>
+                  {user ? (
+                    <button 
+                      onClick={() => navigate('/profile')}
+                      className="w-8 h-8 rounded-full bg-maroon-800 border border-maroon-700 shadow-sm overflow-hidden hover:ring-2 hover:ring-gold-500 transition-all flex items-center justify-center p-0"
+                    >
+                      <img 
+                        src={user.user_metadata?.avatar_url || user.user_metadata?.picture || `https://ui-avatars.com/api/?name=${user.email}&background=fbbf24&color=4c0519`} 
+                        alt="Avatar" 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer" 
+                      />
+                    </button>
+                  ) : (
+                    <div className="px-3 py-1 bg-gold-500/10 border border-gold-500/20 rounded-full flex items-center gap-2">
+                       <Signal size={12} className="text-gold-400 animate-pulse" />
+                       <span className="text-[10px] font-bold text-gold-400 uppercase tracking-widest">Guest Monitor</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </header>

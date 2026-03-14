@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Share2, Copy, Check } from 'lucide-react';
 import { SensorData } from '../types';
 import { SensorCard } from './SensorCard';
 import { MoistureChart } from './MoistureChart';
@@ -24,7 +24,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
   lastRefresh,
   setIsSetupOpen
 }) => {
+  const [copied, setCopied] = React.useState(false);
   const selectedSensor = sensors.find(s => s.id === selectedSensorId);
+
+  const handleCopyCode = () => {
+    if (selectedSensor) {
+      navigator.clipboard.writeText(selectedSensor.id);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-8">
@@ -91,7 +100,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <div className="flex items-center gap-1 bg-maroon-900/40 rounded-xl px-2 py-1.5 border border-maroon-800/30 group">
+                      <span className="text-[10px] uppercase font-bold text-maroon-400/70 tracking-tighter ml-1">Share Code:</span>
+                      <code className="text-xs font-mono text-gold-400 px-2 select-all uppercase tracking-tight">{selectedSensor.id}</code>
+                      <button 
+                        onClick={handleCopyCode}
+                        className="p-1.5 text-maroon-400 hover:text-gold-400 transition-colors rounded-lg hover:bg-gold-500/10"
+                        title="Copy Share Code"
+                      >
+                        {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                      </button>
+                    </div>
                     <div className="px-4 py-2 bg-maroon-900/40 rounded-xl text-xs font-medium text-maroon-200 flex items-center gap-2 border border-maroon-800/30">
                       <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
                       {selectedSensor.lastUpdated ? `Updated ${lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Waiting for data...'}
