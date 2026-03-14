@@ -191,7 +191,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                     <div className="flex items-center gap-1 bg-maroon-900/40 rounded-xl px-2 py-1.5 border border-maroon-800/30 group">
-                      <span className="text-[10px] uppercase font-bold text-maroon-400/70 tracking-tighter ml-1">Share Code:</span>
                       <code className="text-xs font-mono text-gold-400 px-2 select-all uppercase tracking-tight">{selectedSensor.id}</code>
                       <button 
                         onClick={handleCopyCode}

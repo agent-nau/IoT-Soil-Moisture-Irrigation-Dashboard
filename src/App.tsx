@@ -33,10 +33,12 @@ function AppContent() {
     const raw = localStorage.getItem('sharedSensorId');
     return raw?.includes(':') ? raw.split(':')[1] : localStorage.getItem('sharedMonitorName');
   });
+  const [monitorName, setMonitorName] = useState<string | null>(localStorage.getItem('monitorName'));
+  const [customSheetId, setCustomSheetId] = useState<string | null>(localStorage.getItem('customSheetId'));
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const navigate = useNavigate();
 
-  const sheetId = import.meta.env.VITE_GOOGLE_SHEET_ID || DEFAULT_SHEET_ID;
+  const sheetId = customSheetId || import.meta.env.VITE_GOOGLE_SHEET_ID || DEFAULT_SHEET_ID;
 
   const loadData = useCallback(async () => {
     try {
@@ -135,6 +137,18 @@ function AppContent() {
     }
   }, [loadData, user, sharedSensorId]);
 
+  const handleSetMonitorName = (name: string) => {
+    localStorage.setItem('monitorName', name);
+    setMonitorName(name);
+    setIsSetupOpen(true); // Open sensor setup right after naming
+  };
+
+  const handleAddSensor = (id: string) => {
+    localStorage.setItem('customSheetId', id);
+    setCustomSheetId(id);
+    loadData();
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
   };
@@ -160,12 +174,55 @@ function AppContent() {
               localStorage.setItem('sharedSensorId', combinedCode);
               if (name) localStorage.setItem('sharedMonitorName', name);
             }} />
+          ) : (user && !monitorName) ? (
+            <div className="min-h-screen bg-maroon-950 flex items-center justify-center p-4">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full max-w-md bg-maroon-900 border border-gold-500/20 rounded-3xl p-8 shadow-2xl"
+              >
+                <div className="flex flex-col items-center mb-8">
+                   <div className="w-20 h-20 bg-gold-500/10 rounded-2xl flex items-center justify-center mb-4">
+                     <LayoutDashboard className="text-gold-400" size={40} />
+                   </div>
+                   <h2 className="text-2xl font-bold text-white">Name Your Monitor</h2>
+                   <p className="text-maroon-300 text-sm mt-2 text-center">Give your irrigation system a name before entering the dashboard.</p>
+                </div>
+                
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const name = (e.target as any).monitorName.value;
+                    if (name) handleSetMonitorName(name);
+                  }}
+                  className="space-y-4"
+                >
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gold-400 ml-1">Monitor Name</label>
+                    <input 
+                      name="monitorName"
+                      required
+                      autoFocus
+                      placeholder="e.g. Backyard Garden"
+                      className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-3 px-4 text-gold-50 placeholder:text-gold-500/30 focus:outline-none focus:ring-2 focus:ring-gold-500/50 transition-all"
+                    />
+                  </div>
+                  <button 
+                    type="submit"
+                    className="w-full bg-gold-500 hover:bg-gold-400 text-maroon-950 font-bold py-4 rounded-xl transition-all shadow-lg shadow-gold-500/20"
+                  >
+                    Set Name & Enter Dashboard
+                  </button>
+                </form>
+              </motion.div>
+            </div>
           ) : (
             <div className="min-h-screen bg-maroon-950 text-gold-50 font-sans">
               <SetupModal 
                 isOpen={isSetupOpen} 
                 onClose={() => setIsSetupOpen(false)} 
-                user={user} // Pass user to SetupModal
+                onAddSensor={handleAddSensor}
+                user={user} 
               />
               
               <header className="sticky top-0 z-10 bg-maroon-900/80 backdrop-blur-md border-b border-maroon-800/50">
@@ -183,7 +240,9 @@ function AppContent() {
               />
             </div>
             <div className="flex flex-col">
-              <h1 className="font-bold text-lg tracking-tight text-gold-50 leading-none">LDCU Soil Moisture</h1>
+              <h1 className="font-bold text-lg tracking-tight text-gold-50 leading-none">
+                {monitorName || 'LDCU Soil Moisture'}
+              </h1>
               <span className="text-[10px] text-maroon-300 font-bold uppercase tracking-widest mt-1">Detector System</span>
             </div>
           </div>
