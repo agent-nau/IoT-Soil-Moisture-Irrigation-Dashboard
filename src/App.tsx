@@ -33,7 +33,7 @@ function AppContent() {
     const raw = localStorage.getItem('sharedSensorId');
     return raw?.includes(':') ? raw.split(':')[1] : localStorage.getItem('sharedMonitorName');
   });
-  const [monitorName, setMonitorName] = useState<string | null>(null);
+  const [monitorName, setMonitorName] = useState<string | null>(localStorage.getItem('monitor_name'));
   const [customSheetId, setCustomSheetId] = useState<string | null>(localStorage.getItem('customSheetId'));
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const navigate = useNavigate();
@@ -169,6 +169,14 @@ function AppContent() {
   };
 
   const handleSignOut = async () => {
+    localStorage.removeItem('monitor_name');
+    localStorage.removeItem('customSheetId');
+    localStorage.removeItem('sharedSensorId');
+    localStorage.removeItem('sharedMonitorName');
+    setMonitorName(null);
+    setCustomSheetId(null);
+    setSharedSensorId(null);
+    setSharedMonitorName(null);
     await supabase.auth.signOut();
   };
 
