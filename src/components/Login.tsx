@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase, supabaseConfigured } from '../supabase';
-import { Droplets, Lock, Mail, ArrowRight, Loader2 } from 'lucide-react';
+import { Droplets, Lock, Mail, ArrowRight, Loader2, Github } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export const Login: React.FC = () => {
@@ -186,14 +186,25 @@ export const Login: React.FC = () => {
           </div>
           
           <p className="text-[10px] text-center text-maroon-300/50 px-4 mt-6">
-            By signing in, you agree to the sture Detection System terms of service and privacy policy.
+            By signing in, you agree to the Liceo Moisture Detection System terms of service and privacy policy.
           </p>
         </div>
         
-        {/* Footer text */}
-        <p className="text-center text-maroon-400/50 text-xs mt-6">
-          © 2026 LDCU: Grade 11, ICT 1. All rights reserved.
-        </p>
+        {/* Footer content */}
+        <div className="flex flex-col items-center gap-3 mt-8">
+          <a 
+            href="https://github.com/agent-nau/IoT-Soil-Moisture-Irrigation-Dashboard" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-maroon-400/70 hover:text-gold-400 transition-colors text-xs font-medium"
+          >
+            <Github size={14} />
+            <span>Public Project</span>
+          </a>
+          <p className="text-center text-maroon-400/40 text-[10px] uppercase tracking-widest font-bold">
+            © 2026 Liceo Moisture Monitor
+          </p>
+        </div>
       </motion.div>
     </div>
   );

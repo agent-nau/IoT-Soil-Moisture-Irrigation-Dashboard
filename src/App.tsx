@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, LayoutDashboard, Settings, Bell, Search, Plus, Info, Battery, Signal, Thermometer, LogOut } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Settings, Bell, Search, Plus, Info, Battery, Signal, Thermometer, LogOut, Github } from 'lucide-react';
 import { SensorData, SensorReading } from './types';
 import { fetchSheetData } from './services/googleSheetsService';
 import { SensorCard } from './components/SensorCard';
@@ -199,6 +199,15 @@ function AppContent() {
                   <span className="text-xs font-bold tracking-widest uppercase text-maroon-200">Soil Moisture Detector v1.0</span>
                 </div>
                 <div className="flex gap-8 text-xs font-medium text-maroon-400">
+                  <a 
+                    href="https://github.com/agent-nau/IoT-Soil-Moisture-Irrigation-Dashboard" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-gold-400 transition-colors"
+                  >
+                    <Github size={14} />
+                    <span>Public Repo</span>
+                  </a>
                   <Link to="/privacy" className="hover:text-gold-400 transition-colors">Privacy</Link>
                 </div>
               </div>
