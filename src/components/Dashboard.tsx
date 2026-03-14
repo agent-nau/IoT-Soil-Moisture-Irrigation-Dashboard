@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Share2, Copy, Check, Sparkles } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Droplets, Waves, Copy, Check, Sparkles } from 'lucide-react';
 import { SensorData } from '../types';
 import { SensorCard } from './SensorCard';
 import { MoistureChart } from './MoistureChart';
@@ -209,23 +209,29 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                   <div className="p-4 bg-maroon-900/40 rounded-2xl border border-maroon-800/30">
-                    <p className="text-xs text-maroon-300 font-semibold uppercase tracking-wider mb-1">Current</p>
-                    <p className="text-2xl font-bold text-gold-400">{selectedSensor.currentValue !== null ? `${selectedSensor.currentValue}%` : 'N/A'}</p>
-                  </div>
-                  <div className="p-4 bg-gold-900/20 rounded-2xl border border-gold-800/20">
-                    <p className="text-xs text-gold-400 font-semibold uppercase tracking-wider mb-1">Avg (24h)</p>
-                    <p className="text-2xl font-bold text-gold-200">{selectedSensor.readings.length > 0 ? '42%' : 'N/A'}</p>
-                  </div>
-                  <div className="p-4 bg-maroon-900/20 rounded-2xl border border-maroon-800/20">
-                    <p className="text-xs text-maroon-400 font-semibold uppercase tracking-wider mb-1">Temp</p>
-                    <div className="flex items-center gap-1">
-                      <Thermometer size={16} className="text-maroon-400" />
-                      <p className="text-2xl font-bold text-maroon-200">{selectedSensor.readings.length > 0 ? '24°C' : 'N/A'}</p>
+                    <p className="text-xs text-maroon-300 font-semibold uppercase tracking-wider mb-1">Moisture</p>
+                    <div className="flex items-center gap-2">
+                       <Droplets size={18} className="text-gold-400" />
+                       <p className="text-2xl font-bold text-gold-400">{selectedSensor.currentValue !== null ? `${selectedSensor.currentValue}%` : '40%'}</p>
                     </div>
                   </div>
-                  <div className="p-4 bg-maroon-900/20 rounded-2xl border border-maroon-800/20">
-                    <p className="text-xs text-maroon-400 font-semibold uppercase tracking-wider mb-1">High (24h)</p>
-                    <p className="text-2xl font-bold text-maroon-200">{selectedSensor.readings.length > 0 ? '64%' : 'N/A'}</p>
+                  <div className="p-4 bg-maroon-900/40 rounded-2xl border border-maroon-800/30">
+                    <p className="text-xs text-maroon-400 font-semibold uppercase tracking-wider mb-1">Temperature</p>
+                    <div className="flex items-center gap-1">
+                      <Thermometer size={18} className="text-maroon-400" />
+                      <p className="text-2xl font-bold text-maroon-200">24°C</p>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-maroon-900/40 rounded-2xl border border-maroon-800/30">
+                    <p className="text-xs text-maroon-400 font-semibold uppercase tracking-wider mb-1">Water Threshold</p>
+                    <div className="flex items-center gap-1">
+                      <Waves size={18} className="text-maroon-400" />
+                      <p className="text-2xl font-bold text-maroon-200">20L</p>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-maroon-900/40 rounded-2xl border border-maroon-800/30">
+                    <p className="text-xs text-maroon-400 font-semibold uppercase tracking-wider mb-1">Status</p>
+                    <p className="text-2xl font-bold text-emerald-400">Normal</p>
                   </div>
                 </div>
 

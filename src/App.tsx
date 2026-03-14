@@ -42,14 +42,17 @@ function AppContent() {
 
   const sheetId = customSheetId || import.meta.env.VITE_GOOGLE_SHEET_ID || DEFAULT_SHEET_ID;
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (forcedId?: string) => {
+    setLoading(true);
     try {
       let sheetReadings: SensorReading[] = [];
       let supabaseReadings: SensorReading[] = [];
       
+      const currentSheetId = forcedId || sheetId;
+      
       // Fetch from Google Sheets if configured
-      if (sheetId && sheetId !== '1-X_your_sheet_id_here') {
-        sheetReadings = await fetchSheetData(sheetId);
+      if (currentSheetId && currentSheetId !== '1-X_your_sheet_id_here') {
+        sheetReadings = await fetchSheetData(currentSheetId);
       }
 
       // Fetch from Supabase Database
@@ -91,7 +94,9 @@ function AppContent() {
       }
 
       setSensors(sensorData);
-      if (!selectedSensorId && sensorData.length > 0) {
+      
+      // If we are forcing a new ID or don't have a selection, pick the first one
+      if ((forcedId || !selectedSensorId) && sensorData.length > 0) {
         setSelectedSensorId(sensorData[0].id);
       }
       setError(null);
@@ -155,6 +160,7 @@ function AppContent() {
   };
 
   const handleAddSensor = async (id: string) => {
+    setLoading(true);
     try {
       if (user) {
         const { error } = await supabase.auth.updateUser({
@@ -165,12 +171,13 @@ function AppContent() {
       
       localStorage.setItem('customSheetId', id);
       setCustomSheetId(id);
-      loadData();
+      setSelectedSensorId(null); // Reset selection to force auto-select of new sensor
+      await loadData(id);
     } catch (err) {
       console.error('Error saving sheet ID:', err);
       localStorage.setItem('customSheetId', id);
       setCustomSheetId(id);
-      loadData();
+      await loadData(id);
     }
   };
 
