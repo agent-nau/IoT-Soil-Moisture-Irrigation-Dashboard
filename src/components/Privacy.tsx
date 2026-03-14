@@ -10,7 +10,7 @@ export const Privacy: React.FC = () => {
     <div className="min-h-screen bg-maroon-950 text-gold-50 font-sans">
       <header className="sticky top-0 z-10 bg-maroon-900/80 backdrop-blur-md border-b border-maroon-800/50">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/dashboard')}>
             <div className="w-8 h-8 flex items-center justify-center p-1">
               <img src="/liceo.png" alt="Liceo Logo" className="w-full h-full object-contain" />
             </div>
@@ -79,9 +79,12 @@ export const Privacy: React.FC = () => {
               <p className="text-maroon-200 mb-6">
                 You have the right to request a copy of all data associated with your account or to have your account permanently deleted from our system at any time.
               </p>
-              <button className="px-6 py-3 bg-gold-500 hover:bg-gold-400 text-maroon-950 font-bold rounded-xl transition-all shadow-lg shadow-gold-500/20">
-                Contact Privacy Team
-              </button>
+              <a 
+                href="mailto:megwhite1223@gmail.com"
+                className="inline-block px-6 py-3 bg-gold-500 hover:bg-gold-400 text-maroon-950 font-bold rounded-xl transition-all shadow-lg shadow-gold-500/20"
+              >
+                Contact Developer
+              </a>
             </div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
           </div>
