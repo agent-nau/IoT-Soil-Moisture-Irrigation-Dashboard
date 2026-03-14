@@ -52,18 +52,27 @@ export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose, onAddSe
         >
           <div className="space-y-4">
 
-            <div className="space-y-2 pt-2">
+            <div className="space-y-3 pt-2">
               <label className="text-[10px] font-bold uppercase tracking-widest text-gold-400 ml-1">Google Sheet CSV Link</label>
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gold-500 rounded-xl blur opacity-0 group-focus-within:opacity-10 transition-opacity"></div>
-                <input 
-                  required
-                  value={sheetUrl}
-                  onChange={(e) => setSheetUrl(e.target.value)}
-                  placeholder="Paste your https://docs.google.com/.../pub?output=csv"
-                  className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-3 px-4 text-gold-50 placeholder:text-gold-500/20 focus:outline-none focus:ring-2 focus:ring-gold-500/50 transition-all text-sm"
-                />
-              </div>
+              <motion.div 
+                whileHover={{ scale: 1.005 }}
+                whileFocus={{ scale: 1.005 }}
+                className="relative group cursor-text"
+              >
+                <div className="absolute inset-0 bg-gold-400/10 rounded-xl blur-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative">
+                  <input 
+                    required
+                    value={sheetUrl}
+                    onChange={(e) => setSheetUrl(e.target.value)}
+                    placeholder="Paste your https://docs.google.com/.../pub?output=csv"
+                    className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-4 px-5 text-gold-50 placeholder:text-gold-500/10 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500/50 transition-all text-sm shadow-inner"
+                  />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 opacity-30 group-focus-within:opacity-100 transition-opacity">
+                    <Database size={14} className="text-gold-400" />
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </div>
 

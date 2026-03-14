@@ -114,17 +114,26 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
                 <Lock size={12} />
                 <span>Monitor with Code</span>
               </div>
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gold-500 rounded-xl blur opacity-0 group-focus-within:opacity-10 transition-opacity"></div>
-                <input
-                  type="text"
-                  required
-                  value={shareCode}
-                  onChange={(e) => setShareCode(e.target.value)}
-                  className="w-full bg-maroon-950/50 border border-gold-500/30 rounded-xl py-3 px-4 text-gold-50 placeholder:text-gold-500/20 focus:outline-none focus:ring-1 focus:ring-gold-500/30 transition-all font-sans text-sm"
-                  placeholder="Enter share code here"
-                />
-              </div>
+              <motion.div 
+                whileHover={{ scale: 1.01 }}
+                whileFocus={{ scale: 1.01 }}
+                className="relative group cursor-text"
+              >
+                <div className="absolute inset-0 bg-gold-400/20 rounded-xl blur-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300"></div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    value={shareCode}
+                    onChange={(e) => setShareCode(e.target.value)}
+                    className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-4 px-5 text-gold-50 placeholder:text-gold-500/20 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500/50 transition-all font-sans text-sm shadow-inner"
+                    placeholder="Type or paste share code here..."
+                  />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 opacity-50 group-focus-within:opacity-100 transition-opacity">
+                    <span className="text-[10px] font-bold text-gold-500/60 font-mono tracking-tighter">SHARE-ID</span>
+                  </div>
+                </div>
+              </motion.div>
 
               {error && (
                 <div className="p-3 bg-red-950/30 border border-red-800/30 rounded-xl text-red-200 text-xs text-center">
@@ -135,10 +144,10 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 hover:text-white font-bold rounded-xl border border-gold-500/20 transition-all flex items-center justify-center gap-2"
+                className="w-full py-4 bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 hover:text-white font-bold rounded-xl border border-gold-500/20 transition-all flex items-center justify-center gap-2 group/btn"
               >
                 Monitor Sensor
-                <ArrowRight size={18} />
+                <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
               </button>
             </form>
 
