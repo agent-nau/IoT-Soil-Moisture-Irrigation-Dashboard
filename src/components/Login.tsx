@@ -4,7 +4,7 @@ import { Droplets, Lock, Mail, ArrowRight, Loader2, Github } from 'lucide-react'
 import { motion } from 'motion/react';
 
 interface LoginProps {
-  onSharedAccess?: (code: string) => void;
+  onSharedAccess?: (combinedCode: string) => void;
 }
 
 export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
@@ -77,7 +77,6 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
       return;
     }
     
-    localStorage.setItem('sharedSensorId', shareCode.trim());
     if (onSharedAccess) {
       onSharedAccess(shareCode.trim());
     }

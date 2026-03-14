@@ -25,7 +25,14 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
-  const [sharedSensorId, setSharedSensorId] = useState<string | null>(localStorage.getItem('sharedSensorId'));
+  const [sharedSensorId, setSharedSensorId] = useState<string | null>(() => {
+    const raw = localStorage.getItem('sharedSensorId');
+    return raw?.includes(':') ? raw.split(':')[0] : raw;
+  });
+  const [sharedMonitorName, setSharedMonitorName] = useState<string | null>(() => {
+    const raw = localStorage.getItem('sharedSensorId');
+    return raw?.includes(':') ? raw.split(':')[1] : localStorage.getItem('sharedMonitorName');
+  });
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -145,9 +152,21 @@ function AppContent() {
       <Route 
         path="/" 
         element={
-          (!user && !sharedSensorId) ? <Login onSharedAccess={(code) => setSharedSensorId(code)} /> : (
+          (!user && !sharedSensorId) ? (
+            <Login onSharedAccess={(combinedCode) => {
+              const [id, name] = combinedCode.includes(':') ? combinedCode.split(':') : [combinedCode, ''];
+              setSharedSensorId(id);
+              setSharedMonitorName(name || 'Guest Monitor');
+              localStorage.setItem('sharedSensorId', combinedCode);
+              if (name) localStorage.setItem('sharedMonitorName', name);
+            }} />
+          ) : (
             <div className="min-h-screen bg-maroon-950 text-gold-50 font-sans">
-              <SetupModal isOpen={isSetupOpen} onClose={() => setIsSetupOpen(false)} />
+              <SetupModal 
+                isOpen={isSetupOpen} 
+                onClose={() => setIsSetupOpen(false)} 
+                user={user} // Pass user to SetupModal
+              />
               
               <header className="sticky top-0 z-10 bg-maroon-900/80 backdrop-blur-md border-b border-maroon-800/50">
                 <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -180,7 +199,9 @@ function AppContent() {
                     <button 
                       onClick={user ? handleSignOut : () => {
                         localStorage.removeItem('sharedSensorId');
+                        localStorage.removeItem('sharedMonitorName');
                         setSharedSensorId(null);
+                        setSharedMonitorName(null);
                       }}
                       className="p-2 text-maroon-300 hover:text-red-400 transition-colors flex items-center gap-2"
                       title={user ? "Sign Out" : "Exit Monitor"}
@@ -202,7 +223,9 @@ function AppContent() {
                   ) : (
                     <div className="px-3 py-1 bg-gold-500/10 border border-gold-500/20 rounded-full flex items-center gap-2">
                        <Signal size={12} className="text-gold-400 animate-pulse" />
-                       <span className="text-[10px] font-bold text-gold-400 uppercase tracking-widest">Guest Monitor</span>
+                       <span className="text-[10px] font-bold text-gold-400 uppercase tracking-widest">
+                         {sharedMonitorName ? `Monitor: ${sharedMonitorName}` : 'Guest Monitor'}
+                       </span>
                     </div>
                   )}
                 </div>
@@ -217,6 +240,7 @@ function AppContent() {
               error={error}
               lastRefresh={lastRefresh}
               setIsSetupOpen={setIsSetupOpen}
+              user={user}
             />
 
             <footer className="max-w-5xl mx-auto px-4 py-12 border-t border-maroon-900/50 mt-12">

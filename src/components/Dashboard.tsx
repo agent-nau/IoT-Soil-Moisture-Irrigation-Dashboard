@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Share2, Copy, Check } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Share2, Copy, Check, Sparkles } from 'lucide-react';
 import { SensorData } from '../types';
 import { SensorCard } from './SensorCard';
 import { MoistureChart } from './MoistureChart';
@@ -13,6 +13,7 @@ interface DashboardProps {
   error: string | null;
   lastRefresh: Date;
   setIsSetupOpen: (open: boolean) => void;
+  user: any;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
@@ -22,14 +23,51 @@ export const Dashboard: React.FC<DashboardProps> = ({
   loading,
   error,
   lastRefresh,
-  setIsSetupOpen
+  setIsSetupOpen,
+  user
 }) => {
   const [copied, setCopied] = React.useState(false);
+  const [customName, setCustomName] = React.useState('');
+  const [generatedCode, setGeneratedCode] = React.useState<string | null>(null);
   const selectedSensor = sensors.find(s => s.id === selectedSensorId);
+
+  const getAccountName = () => {
+    return user?.user_metadata?.full_name?.split(' ')[0] || 
+           user?.user_metadata?.name?.split(' ')[0] || 
+           user?.email?.split('@')[0] || 
+           'Owner';
+  };
+
+  const generateUniqueCode = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let randomPart = '';
+    for (let i = 0; i < 6; i++) {
+      randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    // Create prefix from custom name (e.g., "El Salvador" -> "ElSal")
+    let prefix = 'LDCU';
+    if (customName.trim()) {
+      const cleanName = customName.trim().replace(/[^a-zA-Z0-9]/g, '');
+      prefix = cleanName.length > 5 ? cleanName.substring(0, 5) : cleanName;
+    }
+    
+    const accountName = getAccountName();
+    setGeneratedCode(`${prefix}-${randomPart}:${accountName}`);
+  };
 
   const handleCopyCode = () => {
     if (selectedSensor) {
-      navigator.clipboard.writeText(selectedSensor.id);
+      const accountName = getAccountName();
+      navigator.clipboard.writeText(`${selectedSensor.id}:${accountName}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleCopyGenerated = () => {
+    if (generatedCode) {
+      navigator.clipboard.writeText(generatedCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -65,6 +103,57 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   onClick={() => setSelectedSensorId(sensor.id)}
                 />
               ))
+            )}
+          </div>
+
+          {/* Code Generator Card */}
+          <div className="bg-gradient-to-br from-gold-500/10 to-transparent border border-gold-500/20 rounded-2xl p-5 space-y-3">
+            <div className="flex items-center gap-2 text-gold-400">
+              <Sparkles size={16} />
+              <h3 className="text-xs font-bold uppercase tracking-widest">Unique Code Generator</h3>
+            </div>
+            <p className="text-[10px] text-maroon-300 leading-tight">
+              Enter a location or name to create a personalized ID for your hardware.
+            </p>
+            
+            <div className="relative">
+              <input 
+                type="text"
+                placeholder="e.g. El Salvador"
+                value={customName}
+                onChange={(e) => setCustomName(e.target.value)}
+                className="w-full bg-maroon-950/50 border border-gold-500/20 rounded-xl py-2 px-3 text-xs text-gold-50 placeholder:text-maroon-500/50 focus:outline-none focus:ring-1 focus:ring-gold-500/30 transition-all font-sans"
+              />
+            </div>
+
+            {generatedCode ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between bg-black/20 rounded-xl p-2 border border-gold-500/30">
+                  <code className="text-[11px] font-mono text-gold-400 font-bold ml-1 truncate" title={generatedCode}>{generatedCode}</code>
+                  <button 
+                    onClick={handleCopyGenerated}
+                    className="p-2 text-gold-400 hover:bg-gold-500/10 rounded-lg transition-colors flex-shrink-0"
+                  >
+                    {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+                  </button>
+                </div>
+                <button 
+                  onClick={() => {
+                    setGeneratedCode(null);
+                    setCustomName('');
+                  }}
+                  className="text-[10px] text-maroon-400 hover:text-gold-400 underline transition-colors"
+                >
+                  Generate another
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={generateUniqueCode}
+                className="w-full py-2 bg-gold-500/20 hover:bg-gold-500/30 text-gold-400 text-xs font-bold rounded-xl border border-gold-500/30 transition-all uppercase tracking-widest"
+              >
+                Generate ID
+              </button>
             )}
           </div>
 
