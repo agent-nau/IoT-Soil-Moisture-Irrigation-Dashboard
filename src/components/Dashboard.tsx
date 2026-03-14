@@ -248,9 +248,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <MoistureChart readings={selectedSensor.readings} />
               </motion.div>
             ) : (
-              <div className="h-[500px] flex flex-col items-center justify-center text-maroon-300/30 bg-maroon-900/10 rounded-3xl border border-dashed border-maroon-800/30">
-                <LayoutDashboard size={48} className="mb-4 opacity-20" />
-                <p>Select a sensor to view details</p>
+              <div className="h-[500px] flex flex-col items-center justify-center text-maroon-300 bg-maroon-900/10 rounded-3xl border border-dashed border-maroon-800/30 p-8 text-center">
+                <div className="w-16 h-16 bg-gold-500/10 rounded-2xl flex items-center justify-center mb-4">
+                  <Plus size={32} className="text-gold-400/50" />
+                </div>
+                <h3 className="text-lg font-bold text-gold-50 mb-2">No sensors yet</h3>
+                <p className="text-sm text-maroon-300/60 max-w-xs">
+                  {sensors.length === 0 
+                    ? "Your dashboard is ready. Click the plus button on the left to add your first irrigation sensor."
+                    : "Select a sensor from the sidebar to view detailed moisture level analysis."}
+                </p>
               </div>
             )}
           </AnimatePresence>

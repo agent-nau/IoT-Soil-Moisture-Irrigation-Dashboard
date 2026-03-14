@@ -87,15 +87,7 @@ function AppContent() {
           };
         }).slice(0, 1);
       } else {
-        sensorData = [{
-          id: 'primary-detector',
-          name: 'Soil Moisture Detector',
-          readings: [],
-          currentValue: null,
-          lastUpdated: null,
-          battery: null,
-          signal: null,
-        }];
+        sensorData = [];
       }
 
       setSensors(sensorData);
@@ -121,11 +113,6 @@ function AppContent() {
         setCustomSheetId(currentUser.user_metadata?.custom_sheet_id || null);
       }
       setAuthLoading(false);
-      
-      // No need to redirect if the root itself is the dashboard
-      if (currentUser && window.location.pathname === '/dashboard') {
-        navigate('/', { replace: true });
-      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -209,17 +196,29 @@ function AppContent() {
 
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/home" replace />} />
       <Route 
-        path="/" 
+        path="/home" 
         element={
-          (!user && !sharedSensorId) ? (
+          (user || sharedSensorId) ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
             <Login onSharedAccess={(combinedCode) => {
               const [id, name] = combinedCode.includes(':') ? combinedCode.split(':') : [combinedCode, ''];
               setSharedSensorId(id);
               setSharedMonitorName(name || 'Guest Monitor');
               localStorage.setItem('sharedSensorId', combinedCode);
               if (name) localStorage.setItem('sharedMonitorName', name);
+              navigate('/dashboard');
             }} />
+          )
+        } 
+      />
+      <Route 
+        path="/dashboard" 
+        element={
+          (!user && !sharedSensorId) ? (
+            <Navigate to="/home" replace />
           ) : (user && !monitorName) ? (
             <div className="min-h-screen bg-maroon-950 flex items-center justify-center p-4">
               <motion.div 
@@ -269,13 +268,13 @@ function AppContent() {
                 onClose={() => setIsSetupOpen(false)} 
                 onAddSensor={handleAddSensor}
                 user={user} 
-                isRequired={!customSheetId}
+                isRequired={false}
               />
               
               <header className="sticky top-0 z-10 bg-maroon-900/80 backdrop-blur-md border-b border-maroon-800/50">
                 <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-            <div className="w-10 h-10 flex items-center justify-center p-1">
+                  <div className="flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80" onClick={() => navigate('/dashboard')}>
+                    <div className="w-10 h-10 flex items-center justify-center p-1">
               <img 
                 src="/liceo.png" 
                 alt="Liceo Logo" 
@@ -329,24 +328,18 @@ function AppContent() {
                   
                   <div className="flex items-center gap-4">
                     <button 
-                      onClick={() => setIsSetupOpen(true)}
-                      className="p-2 text-maroon-300 hover:text-gold-400 transition-colors flex items-center gap-2"
-                    >
-                      <Info size={20} />
-                      <span className="hidden md:inline text-xs font-bold uppercase tracking-widest">Setup</span>
-                    </button>
-                    <button 
                       onClick={user ? handleSignOut : () => {
                         localStorage.removeItem('sharedSensorId');
                         localStorage.removeItem('sharedMonitorName');
                         setSharedSensorId(null);
                         setSharedMonitorName(null);
+                        navigate('/home');
                       }}
                       className="p-2 text-maroon-300 hover:text-red-400 transition-colors flex items-center gap-2"
                       title={user ? "Sign Out" : "Exit Monitor"}
                     >
                       <LogOut size={20} />
-                    </button>
+                  </button>
                   {user ? (
                     <button 
                       onClick={() => navigate('/profile')}
@@ -408,21 +401,20 @@ function AppContent() {
         )
       } 
     />
-    <Route path="/dashboard" element={<Navigate to="/" replace />} />
       <Route 
         path="/profile" 
         element={
-          !user ? <Navigate to="/" /> : (
+          !user ? <Navigate to="/home" /> : (
             <div className="min-h-screen bg-maroon-950 text-gold-50 font-sans">
               <header className="sticky top-0 z-10 bg-maroon-900/80 backdrop-blur-md border-b border-maroon-800/50">
                 <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-                  <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+                  <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/dashboard')}>
                     <div className="w-8 h-8 flex items-center justify-center p-1">
                       <img src="/liceo.png" alt="Liceo Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="font-bold text-lg tracking-tight text-gold-50">LDCU Soil Moisture Detector</h1>
                   </div>
-                  <button onClick={() => navigate('/')} className="text-xs font-bold uppercase tracking-widest text-gold-400 hover:text-white transition-colors">
+                  <button onClick={() => navigate('/dashboard')} className="text-xs font-bold uppercase tracking-widest text-gold-400 hover:text-white transition-colors">
                     Back to Dashboard
                   </button>
                 </div>
