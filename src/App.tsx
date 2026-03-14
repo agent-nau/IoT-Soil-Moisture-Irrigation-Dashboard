@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, LayoutDashboard, Settings, Bell, Search, Plus, Info, Battery, Signal, Thermometer, LogOut, Github } from 'lucide-react';
 import { SensorData, SensorReading } from './types';
 import { fetchSheetData } from './services/googleSheetsService';
+import { fetchSupabaseData } from './services/supabaseService';
 import { SensorCard } from './components/SensorCard';
 import { MoistureChart } from './components/MoistureChart';
 import { SetupModal } from './components/SetupModal';
@@ -31,11 +32,19 @@ function AppContent() {
 
   const loadData = useCallback(async () => {
     try {
-      let readings: SensorReading[] = [];
+      let sheetReadings: SensorReading[] = [];
+      let supabaseReadings: SensorReading[] = [];
       
+      // Fetch from Google Sheets if configured
       if (sheetId && sheetId !== '1-X_your_sheet_id_here') {
-        readings = await fetchSheetData(sheetId);
+        sheetReadings = await fetchSheetData(sheetId);
       }
+
+      // Fetch from Supabase Database
+      supabaseReadings = await fetchSupabaseData();
+
+      // Merge and deduplicate readings
+      const readings = [...sheetReadings, ...supabaseReadings].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
       let sensorData: SensorData[] = [];
 
@@ -92,9 +101,9 @@ function AppContent() {
       setUser(currentUser);
       setAuthLoading(false);
       
-      // Only auto-redirect if on the root login page
-      if (currentUser && window.location.pathname === '/') {
-        navigate('/dashboard', { replace: true });
+      // No need to redirect if the root itself is the dashboard
+      if (currentUser && window.location.pathname === '/dashboard') {
+        navigate('/', { replace: true });
       }
     });
 
@@ -127,11 +136,10 @@ function AppContent() {
 
   return (
     <Routes>
-      <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Login />} />
       <Route 
-        path="/dashboard" 
+        path="/" 
         element={
-          !user ? <Navigate to="/" /> : (
+          !user ? <Login /> : (
             <div className="min-h-screen bg-maroon-950 text-gold-50 font-sans">
               <SetupModal isOpen={isSetupOpen} onClose={() => setIsSetupOpen(false)} />
               
@@ -221,6 +229,7 @@ function AppContent() {
         )
       } 
     />
+    <Route path="/dashboard" element={<Navigate to="/" replace />} />
       <Route 
         path="/profile" 
         element={
@@ -228,13 +237,13 @@ function AppContent() {
             <div className="min-h-screen bg-maroon-950 text-gold-50 font-sans">
               <header className="sticky top-0 z-10 bg-maroon-900/80 backdrop-blur-md border-b border-maroon-800/50">
                 <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-                  <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/dashboard')}>
+                  <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
                     <div className="w-8 h-8 flex items-center justify-center p-1">
                       <img src="/liceo.png" alt="Liceo Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="font-bold text-lg tracking-tight text-gold-50">LDCU Soil Moisture Detector</h1>
                   </div>
-                  <button onClick={() => navigate('/dashboard')} className="text-xs font-bold uppercase tracking-widest text-gold-400 hover:text-white transition-colors">
+                  <button onClick={() => navigate('/')} className="text-xs font-bold uppercase tracking-widest text-gold-400 hover:text-white transition-colors">
                     Back to Dashboard
                   </button>
                 </div>

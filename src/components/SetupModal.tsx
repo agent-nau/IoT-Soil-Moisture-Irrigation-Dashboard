@@ -44,20 +44,36 @@ export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose }) => {
           <section className="space-y-4">
             <div className="flex items-center gap-2 text-gold-400">
               <Database size={18} />
-              <h3 className="font-bold uppercase tracking-wider text-xs">2. Data Pipeline</h3>
+              <h3 className="font-bold uppercase tracking-wider text-xs">2. Database Options</h3>
             </div>
             <p className="text-maroon-100 text-sm leading-relaxed">
-              The easiest way to log data is via <strong>Google Apps Script</strong>. 
-              Create a script that receives HTTP POST requests and appends rows to your Google Sheet.
+              You can log data to either <strong>Google Sheets</strong> or <strong>Supabase Database</strong>.
             </p>
-            <div className="bg-maroon-950/50 p-4 rounded-2xl border border-maroon-800/50 font-mono text-[10px] text-maroon-200">
-              <p>// Google Apps Script snippet</p>
-              <p>function doPost(e) &#123;</p>
-              <p>&nbsp;&nbsp;var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();</p>
-              <p>&nbsp;&nbsp;var data = JSON.parse(e.postData.contents);</p>
-              <p>&nbsp;&nbsp;sheet.appendRow([new Date(), data.sensorId, data.value]);</p>
-              <p>&nbsp;&nbsp;return ContentService.createTextOutput("Success");</p>
-              <p>&#125;</p>
+            
+            <div className="space-y-2">
+              <h4 className="text-white text-xs font-bold">Option A: Supabase (Recommended)</h4>
+              <p className="text-maroon-200 text-xs">Run this SQL in your Supabase SQL Editor:</p>
+              <div className="bg-maroon-950/50 p-4 rounded-2xl border border-maroon-800/50 font-mono text-[10px] text-maroon-200">
+                <p>CREATE TABLE sensor_readings (</p>
+                <p>&nbsp;&nbsp;id UUID DEFAULT gen_random_uuid() PRIMARY KEY,</p>
+                <p>&nbsp;&nbsp;timestamp TIMESTAMPTZ DEFAULT now(),</p>
+                <p>&nbsp;&nbsp;sensor_id TEXT DEFAULT 'default',</p>
+                <p>&nbsp;&nbsp;value FLOAT8 NOT NULL</p>
+                <p>);</p>
+                <p>-- Enable RLS and add policies for public reading</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-white text-xs font-bold">Option B: Google Sheets</h4>
+              <div className="bg-maroon-950/50 p-4 rounded-2xl border border-maroon-800/50 font-mono text-[10px] text-maroon-200">
+                <p>// Google Apps Script snippet</p>
+                <p>function doPost(e) &#123;</p>
+                <p>&nbsp;&nbsp;var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();</p>
+                <p>&nbsp;&nbsp;var data = JSON.parse(e.postData.contents);</p>
+                <p>&nbsp;&nbsp;sheet.appendRow([new Date(), data.sensorId, data.value]);</p>
+                <p>&#125;</p>
+              </div>
             </div>
           </section>
 
