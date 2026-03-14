@@ -7,9 +7,10 @@ interface SetupModalProps {
   onClose: () => void;
   onAddSensor?: (sheetId: string) => void;
   user: any;
+  isRequired?: boolean;
 }
 
-export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose, onAddSensor, user }) => {
+export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose, onAddSensor, user, isRequired }) => {
   const [sheetUrl, setSheetUrl] = React.useState('');
   if (!isOpen) return null;
 
@@ -27,9 +28,11 @@ export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose, onAddSe
             </div>
             <h2 className="text-xl font-bold text-white">Add New Sensor</h2>
           </div>
-          <button onClick={onClose} className="p-2 text-maroon-300 hover:text-white transition-colors">
-            <X size={20} />
-          </button>
+          {!isRequired && (
+            <button onClick={onClose} className="p-2 text-maroon-300 hover:text-white transition-colors">
+              <X size={20} />
+            </button>
+          )}
         </div>
 
         <form 
@@ -90,13 +93,15 @@ export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose, onAddSe
           </div>
 
           <div className="flex justify-end pt-4 gap-3">
-            <button 
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2 text-maroon-300 hover:text-white font-bold transition-colors"
-            >
-              Cancel
-            </button>
+            {!isRequired && (
+              <button 
+                type="button"
+                onClick={onClose}
+                className="px-6 py-2 text-maroon-300 hover:text-white font-bold transition-colors"
+              >
+                Cancel
+              </button>
+            )}
             <button 
               type="submit"
               className="px-8 py-3 bg-gold-500 hover:bg-gold-400 text-maroon-950 font-bold rounded-xl transition-all shadow-lg shadow-gold-500/20 flex items-center gap-2"

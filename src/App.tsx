@@ -223,6 +223,7 @@ function AppContent() {
                 onClose={() => setIsSetupOpen(false)} 
                 onAddSensor={handleAddSensor}
                 user={user} 
+                isRequired={!customSheetId}
               />
               
               <header className="sticky top-0 z-10 bg-maroon-900/80 backdrop-blur-md border-b border-maroon-800/50">
