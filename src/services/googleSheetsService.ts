@@ -2,7 +2,11 @@ import Papa from 'papaparse';
 import { SensorReading } from '../types';
 
 export const fetchSheetData = async (sheetId: string): Promise<SensorReading[]> => {
-  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
+  // If it's a full URL (like a direct published CSV link), use it directly.
+  // Otherwise, construct the standard Google Sheets query URL.
+  const url = sheetId.startsWith('http') 
+    ? sheetId 
+    : `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`;
   
   try {
     const response = await fetch(url);
