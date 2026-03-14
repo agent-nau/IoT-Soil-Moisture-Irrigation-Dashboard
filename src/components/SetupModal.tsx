@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Plus, Cpu, Wifi, Database, Code } from 'lucide-react';
+import { X, Plus, Cpu, Wifi, Database, Code, Check, Copy, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface SetupModalProps {
@@ -12,6 +12,30 @@ interface SetupModalProps {
 
 export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose, onAddSensor, user, isRequired }) => {
   const [sheetUrl, setSheetUrl] = React.useState('');
+  const [generatedId, setGeneratedId] = React.useState('');
+  const [copied, setCopied] = React.useState(false);
+
+  const generateId = React.useCallback(() => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let id = '';
+    for (let i = 0; i < 6; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const name = user?.user_metadata?.full_name?.split(' ')[0] || user?.user_metadata?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Owner';
+    setGeneratedId(`LDCU-${id}:${name}`);
+  }, [user]);
+
+  React.useEffect(() => {
+    if (isOpen && !generatedId) {
+      generateId();
+    }
+  }, [isOpen, generatedId, generateId]);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   if (!isOpen) return null;
 
   return (
@@ -50,25 +74,38 @@ export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose, onAddSe
           className="p-6 space-y-6"
         >
           <div className="space-y-4">
-            <div className="p-4 bg-gold-500/5 border border-gold-500/10 rounded-2xl space-y-2">
-              <div className="flex items-center gap-2 text-gold-400 text-xs font-bold uppercase tracking-widest">
-                <Database size={14} />
-                <span>Google Sheet CSV Link</span>
+            <div className="p-4 bg-gold-500/5 border border-gold-500/10 rounded-2xl space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-gold-400 text-[10px] font-bold uppercase tracking-widest">
+                  <Sparkles size={14} />
+                  <span>Your Unique Share Code</span>
+                </div>
+                <button 
+                  type="button"
+                  onClick={handleCopy}
+                  className="flex items-center gap-1.5 text-xs font-bold text-gold-400 hover:text-gold-300 transition-colors"
+                >
+                  {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                  <span>{copied ? 'Copied' : 'Copy'}</span>
+                </button>
               </div>
-              <p className="text-maroon-200 text-xs leading-relaxed">
-                Paste your <strong>Published CSV link</strong> from Google Sheets. This allows the dashboard to read your sensor data in real-time.
+              <div className="bg-black/40 rounded-xl p-3 border border-gold-500/20 text-center">
+                <code className="text-lg font-mono text-gold-400 font-bold tracking-wider">{generatedId}</code>
+              </div>
+              <p className="text-maroon-300 text-[10px] leading-relaxed italic text-center">
+                Tell your ESP32 to send data to this ID. Use it to share this monitor with others.
               </p>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-gold-400 ml-1">CSV Published Link</label>
+            <div className="space-y-2 pt-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-gold-400 ml-1">Google Sheet CSV Link</label>
               <div className="relative group">
                 <div className="absolute inset-0 bg-gold-500 rounded-xl blur opacity-0 group-focus-within:opacity-10 transition-opacity"></div>
                 <input 
                   required
                   value={sheetUrl}
                   onChange={(e) => setSheetUrl(e.target.value)}
-                  placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv"
+                  placeholder="Paste your https://docs.google.com/.../pub?output=csv"
                   className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-3 px-4 text-gold-50 placeholder:text-gold-500/20 focus:outline-none focus:ring-2 focus:ring-gold-500/50 transition-all text-sm"
                 />
               </div>

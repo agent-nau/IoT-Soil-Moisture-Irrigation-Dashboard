@@ -33,7 +33,7 @@ function AppContent() {
     const raw = localStorage.getItem('sharedSensorId');
     return raw?.includes(':') ? raw.split(':')[1] : localStorage.getItem('sharedMonitorName');
   });
-  const [monitorName, setMonitorName] = useState<string | null>(localStorage.getItem('monitorName'));
+  const [monitorName, setMonitorName] = useState<string | null>(null);
   const [customSheetId, setCustomSheetId] = useState<string | null>(localStorage.getItem('customSheetId'));
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const navigate = useNavigate();
@@ -114,6 +114,9 @@ function AppContent() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
+      if (currentUser) {
+        setMonitorName(currentUser.user_metadata?.monitor_name || null);
+      }
       setAuthLoading(false);
       
       // No need to redirect if the root itself is the dashboard
@@ -123,7 +126,11 @@ function AppContent() {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      if (currentUser) {
+        setMonitorName(currentUser.user_metadata?.monitor_name || null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -137,10 +144,22 @@ function AppContent() {
     }
   }, [loadData, user, sharedSensorId]);
 
-  const handleSetMonitorName = (name: string) => {
-    localStorage.setItem('monitorName', name);
-    setMonitorName(name);
-    setIsSetupOpen(true); // Open sensor setup right after naming
+  const handleSetMonitorName = async (name: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { monitor_name: name }
+      });
+      if (error) throw error;
+      
+      setMonitorName(name);
+      localStorage.setItem('monitorName', name);
+      setIsSetupOpen(true);
+    } catch (err) {
+      console.error('Error saving monitor name:', err);
+      // Fallback to local state if Supabase update fails
+      setMonitorName(name);
+      localStorage.setItem('monitorName', name);
+    }
   };
 
   const handleAddSensor = (id: string) => {

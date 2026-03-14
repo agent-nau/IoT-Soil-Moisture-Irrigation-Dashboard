@@ -115,17 +115,6 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
           </div>
 
           <div className="space-y-6">
-            {localStorage.getItem('sharedSensorId') && (
-               <button
-                 type="button"
-                 onClick={() => onSharedAccess(localStorage.getItem('sharedSensorId')!)}
-                 className="w-full bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 font-bold py-4 rounded-xl border border-gold-500/30 transition-all flex items-center justify-center gap-2 mb-2 group"
-               >
-                 <LayoutDashboard size={18} className="group-hover:scale-110 transition-transform" />
-                 <span className="text-sm">Continue to Guest Monitor</span>
-               </button>
-            )}
-
             <button
               type="button"
               disabled={loading || !supabaseConfigured}
@@ -136,6 +125,17 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
               <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
               <span className="text-sm font-bold">Sign in with Google</span>
             </button>
+
+            {localStorage.getItem('sharedSensorId') && (
+               <button
+                 type="button"
+                 onClick={() => onSharedAccess(localStorage.getItem('sharedSensorId')!)}
+                 className="w-full bg-transparent hover:bg-gold-500/5 text-gold-400/80 hover:text-gold-400 font-bold py-3 rounded-xl border border-gold-500/10 hover:border-gold-500/30 transition-all flex items-center justify-center gap-2 group mb-2"
+               >
+                 <LayoutDashboard size={16} className="group-hover:scale-110 transition-transform opacity-70" />
+                 <span className="text-xs uppercase tracking-wider">Continue as Guest</span>
+               </button>
+            )}
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
