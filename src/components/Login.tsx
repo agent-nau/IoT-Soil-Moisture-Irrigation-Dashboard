@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase, supabaseConfigured } from '../supabase';
-import { Droplets, Lock, Mail, ArrowRight, Loader2, Github } from 'lucide-react';
+import { Droplets, Lock, Mail, ArrowRight, Loader2, Github, LayoutDashboard } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface LoginProps {
@@ -114,6 +114,38 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
             <p className="text-gold-200/70 text-sm mt-1">Soil Moisture Detection System</p>
           </div>
 
+          <div className="space-y-6">
+            {localStorage.getItem('sharedSensorId') && (
+               <button
+                 type="button"
+                 onClick={() => onSharedAccess(localStorage.getItem('sharedSensorId')!)}
+                 className="w-full bg-gold-500/10 hover:bg-gold-500/20 text-gold-400 font-bold py-4 rounded-xl border border-gold-500/30 transition-all flex items-center justify-center gap-2 mb-2 group"
+               >
+                 <LayoutDashboard size={18} className="group-hover:scale-110 transition-transform" />
+                 <span className="text-sm">Continue to Guest Monitor</span>
+               </button>
+            )}
+
+            <button
+              type="button"
+              disabled={loading || !supabaseConfigured}
+              onClick={handleGoogleLogin}
+              className="w-full bg-white hover:bg-gold-50 disabled:opacity-50 text-gray-900 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-black/20 hover:shadow-gold-500/20 hover:scale-[1.01] border border-transparent hover:border-gold-300"
+              title="Sign in with Google"
+            >
+              <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+              <span className="text-sm font-bold">Sign in with Google</span>
+            </button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gold-500/10"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-maroon-900 px-2 text-gold-500/40 font-bold tracking-widest">Or use account</span>
+              </div>
+            </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             {!supabaseConfigured && (
               <div className="p-3 bg-gold-900/30 border border-gold-500/30 rounded-xl text-gold-200 text-sm text-center">
@@ -179,59 +211,40 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
             </button>
           </form>
 
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gold-500/20"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-maroon-900 px-2 text-gold-500/50 font-bold tracking-widest">Or monitor with code</span>
-            </div>
-          </div>
-
-          <form onSubmit={handleShareCodeAccess} className="space-y-4">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-gold-500 to-amber-600 rounded-xl blur opacity-0 group-focus-within:opacity-30 transition-opacity duration-300"></div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400" size={20} />
-                <input
-                  type="text"
-                  required
-                  value={shareCode}
-                  onChange={(e) => setShareCode(e.target.value)}
-                  className="w-full bg-maroon-950/80 border border-gold-500/30 rounded-xl py-3 pl-11 pr-4 text-gold-50 placeholder:text-gold-500/50 focus:outline-none focus:ring-2 focus:ring-gold-500/50 transition-all font-sans"
-                  placeholder="Paste share code here"
-                />
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gold-500/10"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-maroon-900 px-2 text-gold-500/40 font-bold tracking-widest">Or monitor as guest</span>
               </div>
             </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-maroon-800 hover:bg-maroon-700 text-gold-400 font-bold py-3 rounded-xl transition-all border border-gold-500/20 flex items-center justify-center gap-2"
-            >
-              Monitor Sensor
-              <ArrowRight size={18} />
-            </button>
-          </form>
 
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gold-500/20"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-maroon-900 px-2 text-gold-500/50 font-bold tracking-widest">Or continue with</span>
-            </div>
+            <form onSubmit={handleShareCodeAccess} className="space-y-4">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gold-500 rounded-xl blur opacity-0 group-focus-within:opacity-10 transition-opacity"></div>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400/40" size={20} />
+                  <input
+                    type="text"
+                    required
+                    value={shareCode}
+                    onChange={(e) => setShareCode(e.target.value)}
+                    className="w-full bg-maroon-950/50 border border-gold-500/20 rounded-xl py-3 pl-11 pr-4 text-gold-50 placeholder:text-gold-500/20 focus:outline-none focus:ring-1 focus:ring-gold-500/30 transition-all font-sans text-sm"
+                    placeholder="Enter share code"
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 text-gold-400 hover:text-white font-bold transition-all flex items-center justify-center gap-2"
+              >
+                Monitor Sensor
+                <ArrowRight size={18} />
+              </button>
+            </form>
           </div>
-
-          <button
-            type="button"
-            disabled={loading || !supabaseConfigured}
-            onClick={handleGoogleLogin}
-            className="w-full bg-white hover:bg-gold-50 disabled:opacity-50 text-gray-900 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-3 shadow-lg shadow-black/20 hover:shadow-gold-500/20 hover:scale-[1.01] border border-transparent hover:border-gold-300"
-            title="Sign in with Google"
-          >
-            <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-            <span className="text-sm font-bold">Sign in with Google</span>
-          </button>
           
           <div className="mt-8 text-center">
             <button

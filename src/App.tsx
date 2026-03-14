@@ -166,7 +166,7 @@ function AppContent() {
       <Route 
         path="/" 
         element={
-          (!user && !sharedSensorId) ? (
+          !user ? (
             <Login onSharedAccess={(combinedCode) => {
               const [id, name] = combinedCode.includes(':') ? combinedCode.split(':') : [combinedCode, ''];
               setSharedSensorId(id);
