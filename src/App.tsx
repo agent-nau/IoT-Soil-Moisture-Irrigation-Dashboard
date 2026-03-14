@@ -170,11 +170,16 @@ function AppContent() {
                     >
                       <LogOut size={20} />
                     </button>
-                          <button 
+                  <button 
                     onClick={() => navigate('/profile')}
-                    className="w-8 h-8 rounded-full bg-maroon-800 border border-maroon-700 shadow-sm overflow-hidden hover:ring-2 hover:ring-gold-500 transition-all"
+                    className="w-8 h-8 rounded-full bg-maroon-800 border border-maroon-700 shadow-sm overflow-hidden hover:ring-2 hover:ring-gold-500 transition-all flex items-center justify-center p-0"
                   >
-                    <img src={`https://ui-avatars.com/api/?name=${user.email}&background=fbbf24&color=4c0519`} alt="Avatar" referrerPolicy="no-referrer" />
+                    <img 
+                      src={user.user_metadata?.avatar_url || user.user_metadata?.picture || `https://ui-avatars.com/api/?name=${user.email}&background=fbbf24&color=4c0519`} 
+                      alt="Avatar" 
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer" 
+                    />
                   </button>
                 </div>
               </div>
@@ -244,13 +249,15 @@ function AppContent() {
                   <div className="flex flex-col items-center mb-8">
                     <div className="w-24 h-24 rounded-full bg-gold-500 p-1 mb-4">
                       <img 
-                        src={`https://ui-avatars.com/api/?name=${user.email}&size=128&background=fbbf24&color=4c0519`} 
+                        src={user.user_metadata?.avatar_url || user.user_metadata?.picture || `https://ui-avatars.com/api/?name=${user.email}&size=128&background=fbbf24&color=4c0519`} 
                         alt="Profile" 
-                        className="w-full h-full rounded-full border-4 border-maroon-900" 
+                        className="w-full h-full rounded-full border-4 border-maroon-900 object-cover" 
+                        referrerPolicy="no-referrer"
                       />
                     </div>
-                    <h2 className="text-2xl font-bold text-gold-50">{user.email}</h2>
-                    <p className="text-maroon-300 text-sm mt-1 uppercase tracking-widest font-bold">Soil Moisture Detector User Account</p>
+                    <h2 className="text-2xl font-bold text-gold-50">{user.user_metadata?.full_name || user.user_metadata?.name || user.email}</h2>
+                    <p className="text-maroon-300 text-sm mt-1 uppercase tracking-widest font-bold">{user.email}</p>
+                    <p className="text-maroon-400 text-[10px] mt-2 uppercase tracking-tighter opacity-50 font-bold">LDCU Soil Moisture Detector Account</p>
                   </div>
 
                   <div className="space-y-4">
