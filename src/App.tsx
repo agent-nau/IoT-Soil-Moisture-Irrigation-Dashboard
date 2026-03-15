@@ -36,6 +36,8 @@ function AppContent() {
   const [monitorName, setMonitorName] = useState<string | null>(localStorage.getItem('monitor_name'));
   const [customSheetId, setCustomSheetId] = useState<string | null>(localStorage.getItem('customSheetId'));
   const [isSetupOpen, setIsSetupOpen] = useState(false);
+  const [setupMode, setSetupMode] = useState<'add' | 'edit'>('add');
+  const [sensorName, setSensorName] = useState<string>(localStorage.getItem('sensor_name') || 'Soil Moisture Detector');
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState('');
   const navigate = useNavigate();
@@ -86,7 +88,7 @@ function AppContent() {
           const sorted = [...group].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
           return {
             id,
-            name: 'Soil Moisture Detector',
+            name: sensorName,
             readings: group,
             currentValue: Math.round(sorted[0].value),
             lastUpdated: sorted[0].timestamp,
@@ -143,6 +145,7 @@ function AppContent() {
       if (currentUser) {
         setMonitorName(currentUser.user_metadata?.monitor_name || null);
         setCustomSheetId(currentUser.user_metadata?.custom_sheet_id || null);
+        setSensorName(currentUser.user_metadata?.sensor_name || 'Soil Moisture Detector');
       }
       setAuthLoading(false);
     });
@@ -153,6 +156,7 @@ function AppContent() {
       if (currentUser) {
         setMonitorName(currentUser.user_metadata?.monitor_name || null);
         setCustomSheetId(currentUser.user_metadata?.custom_sheet_id || null);
+        setSensorName(currentUser.user_metadata?.sensor_name || 'Soil Moisture Detector');
       }
     });
 
@@ -206,6 +210,26 @@ function AppContent() {
       setCustomSheetId(null);
       setSensors([]);
       setSelectedSensorId(null);
+    }
+  };
+
+  const handleRenameSensor = async (name: string) => {
+    try {
+      if (user) {
+        const { error } = await supabase.auth.updateUser({
+          data: { sensor_name: name }
+        });
+        if (error) throw error;
+      }
+      
+      localStorage.setItem('sensor_name', name);
+      setSensorName(name);
+      setSensors(prev => prev.map(s => ({ ...s, name })));
+    } catch (err) {
+      console.error('Error renaming sensor:', err);
+      localStorage.setItem('sensor_name', name);
+      setSensorName(name);
+      setSensors(prev => prev.map(s => ({ ...s, name })));
     }
   };
 
@@ -326,6 +350,8 @@ function AppContent() {
                 onAddSensor={handleAddSensor}
                 user={user} 
                 isRequired={false}
+                mode={setupMode}
+                initialSheetId={customSheetId || ''}
               />
               
               <header className="sticky top-0 z-10 bg-maroon-900/80 backdrop-blur-md border-b border-maroon-800/50">
@@ -428,8 +454,16 @@ function AppContent() {
               loading={loading}
               error={error}
               lastRefresh={lastRefresh}
-              setIsSetupOpen={setIsSetupOpen}
+              setIsSetupOpen={(open) => {
+                setSetupMode('add');
+                setIsSetupOpen(open);
+              }}
               onRemoveSensor={handleRemoveSensor}
+              onEditSensor={() => {
+                setSetupMode('edit');
+                setIsSetupOpen(true);
+              }}
+              onRenameSensor={handleRenameSensor}
               user={user}
             />
 

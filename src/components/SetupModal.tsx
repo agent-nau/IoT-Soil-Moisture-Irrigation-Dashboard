@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Plus, Cpu, Wifi, Database, Code } from 'lucide-react';
+import { X, Plus, Cpu, Wifi, Database, Code, Settings } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface SetupModalProps {
@@ -8,10 +8,26 @@ interface SetupModalProps {
   onAddSensor?: (sheetId: string) => void;
   user: any;
   isRequired?: boolean;
+  mode?: 'add' | 'edit';
+  initialSheetId?: string;
 }
 
-export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose, onAddSensor, user, isRequired }) => {
-  const [sheetUrl, setSheetUrl] = React.useState('');
+export const SetupModal: React.FC<SetupModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onAddSensor, 
+  user, 
+  isRequired,
+  mode = 'add',
+  initialSheetId = ''
+}) => {
+  const [sheetUrl, setSheetUrl] = React.useState(initialSheetId);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setSheetUrl(initialSheetId);
+    }
+  }, [isOpen, initialSheetId]);
 
   if (!isOpen) return null;
 
@@ -24,10 +40,10 @@ export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose, onAddSe
       >
         <div className="p-6 border-b border-maroon-800 flex items-center justify-between bg-maroon-900/50">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gold-500/20 rounded-xl text-gold-400">
-              <Plus size={20} />
+            <div className={`p-2 ${mode === 'edit' ? 'bg-blue-500/20 text-blue-400' : 'bg-gold-500/20 text-gold-400'} rounded-xl`}>
+              {mode === 'edit' ? <Settings size={20} /> : <Plus size={20} />}
             </div>
-            <h2 className="text-xl font-bold text-white">Add New Sensor</h2>
+            <h2 className="text-xl font-bold text-white">{mode === 'edit' ? 'Edit Sensor Connection' : 'Add New Sensor'}</h2>
           </div>
           {!isRequired && (
             <button onClick={onClose} className="p-2 text-maroon-300 hover:text-white transition-colors">
@@ -105,10 +121,10 @@ export const SetupModal: React.FC<SetupModalProps> = ({ isOpen, onClose, onAddSe
             )}
             <button 
               type="submit"
-              className="px-8 py-3 bg-gold-500 hover:bg-gold-400 text-maroon-950 font-bold rounded-xl transition-all shadow-lg shadow-gold-500/20 flex items-center gap-2"
+              className={`px-8 py-3 ${mode === 'edit' ? 'bg-blue-600 hover:bg-blue-500' : 'bg-gold-500 hover:bg-gold-400'} text-maroon-950 font-bold rounded-xl transition-all shadow-lg shadow-gold-500/20 flex items-center gap-2`}
             >
-              <Plus size={18} />
-              Connect Sensor
+              {mode === 'edit' ? <Settings size={18} /> : <Plus size={18} />}
+              {mode === 'edit' ? 'Update Connection' : 'Connect Sensor'}
             </button>
           </div>
         </form>

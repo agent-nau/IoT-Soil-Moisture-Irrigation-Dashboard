@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Droplets, Waves, Copy, Check, Sparkles, Trash2 } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Droplets, Waves, Copy, Check, Sparkles, Trash2, Settings, Edit2 } from 'lucide-react';
 import { SensorData } from '../types';
 import { SensorCard } from './SensorCard';
 import { MoistureChart } from './MoistureChart';
@@ -14,6 +14,8 @@ interface DashboardProps {
   lastRefresh: Date;
   setIsSetupOpen: (open: boolean) => void;
   onRemoveSensor?: () => void;
+  onEditSensor?: () => void;
+  onRenameSensor?: (name: string) => void;
   user: any;
 }
 
@@ -26,9 +28,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
   lastRefresh,
   setIsSetupOpen,
   user,
-  onRemoveSensor
+  onRemoveSensor,
+  onEditSensor,
+  onRenameSensor
 }) => {
   const [copied, setCopied] = React.useState(false);
+  const [isEditingSensorName, setIsEditingSensorName] = React.useState(false);
+  const [tempSensorName, setTempSensorName] = React.useState('');
   const [customName, setCustomName] = React.useState('');
   const [generatedCode, setGeneratedCode] = React.useState<string | null>(null);
   const selectedSensor = sensors.find(s => s.id === selectedSensorId);
@@ -121,7 +127,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <div className="relative">
               <input 
                 type="text"
-                placeholder="e.g. El Salvador"
+                placeholder="e.g. Backyard Garden"
                 value={customName}
                 onChange={(e) => setCustomName(e.target.value)}
                 className="w-full bg-maroon-950/50 border border-gold-500/20 rounded-xl py-2 px-3 text-xs text-gold-50 placeholder:text-maroon-500/50 focus:outline-none focus:ring-1 focus:ring-gold-500/30 transition-all font-sans"
@@ -178,8 +184,49 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 className="bg-maroon-900/20 rounded-3xl p-6 md:p-8 shadow-sm border border-maroon-800/30 backdrop-blur-sm"
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white mb-1">{selectedSensor.name}</h2>
+                  <div className="flex-1">
+                    {isEditingSensorName ? (
+                      <form 
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (tempSensorName.trim() && onRenameSensor) {
+                            onRenameSensor(tempSensorName.trim());
+                            setIsEditingSensorName(false);
+                          }
+                        }}
+                        className="flex items-center gap-2 mb-1"
+                      >
+                        <input 
+                          autoFocus
+                          value={tempSensorName}
+                          onChange={(e) => setTempSensorName(e.target.value)}
+                          className="bg-maroon-950/50 border border-gold-500/30 rounded px-2 py-1 text-xl font-bold text-white focus:outline-none focus:ring-1 focus:ring-gold-500/50 w-full max-w-sm"
+                        />
+                        <button type="submit" className="text-emerald-400 hover:text-emerald-300 p-1">
+                          <Check size={20} />
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => setIsEditingSensorName(false)}
+                          className="text-maroon-400 hover:text-maroon-300 p-1"
+                        >
+                          <Plus size={20} className="rotate-45" />
+                        </button>
+                      </form>
+                    ) : (
+                      <div className="flex items-center gap-2 group mb-1">
+                        <h2 className="text-2xl font-bold text-white">{selectedSensor.name}</h2>
+                        <button 
+                          onClick={() => {
+                            setTempSensorName(selectedSensor.name);
+                            setIsEditingSensorName(true);
+                          }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-maroon-400 hover:text-gold-400"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                      </div>
+                    )}
                     <div className="flex items-center gap-3 text-sm text-maroon-200/70">
                       <div className="flex items-center gap-1">
                         <Signal size={14} className={selectedSensor.signal !== null ? 'text-emerald-400' : 'text-maroon-300/20'} />
@@ -196,6 +243,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
                         {selectedSensor.lastUpdated ? `Updated ${lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Waiting for data...'}
                       </div>
+                      {onEditSensor && (
+                        <button 
+                          onClick={onEditSensor}
+                          className="p-2 text-maroon-400 hover:text-gold-400 hover:bg-gold-500/10 rounded-xl transition-all border border-transparent hover:border-gold-500/20"
+                          title="Edit Sensor"
+                        >
+                          <Settings size={18} />
+                        </button>
+                      )}
                       {onRemoveSensor && (
                         <button 
                           onClick={onRemoveSensor}
