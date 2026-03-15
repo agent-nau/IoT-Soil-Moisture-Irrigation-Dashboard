@@ -38,7 +38,25 @@ The **LCDU Soil Moisture Detection System** is a professional-grade IoT monitori
 - **Animations:** Motion (formerly Framer Motion)
 - **Backend/Auth:** Supabase
 - **Data Source:** Google Sheets API (via CSV publishing)
-- **Icons:** Lucide React
+---
+
+## 🛠️ Database Setup
+
+To enable the **Page View Tracking** feature, you need to create the following table in your Supabase SQL Editor:
+
+```sql
+create table site_stats (
+  name text primary key,
+  value text not null,
+  updated_at timestamp with time zone default now()
+);
+
+-- Allow public access to view and update counts (Simplified for MVP)
+alter table site_stats enable row level security;
+create policy "Allow public read access" on site_stats for select using (true);
+create policy "Allow public upsert access" on site_stats for insert with check (true);
+create policy "Allow public update access" on site_stats for update using (true);
+```
 
 ---
 

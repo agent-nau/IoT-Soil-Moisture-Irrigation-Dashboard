@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { supabase, supabaseConfigured } from '../supabase';
-import { Droplets, Lock, Mail, ArrowRight, Loader2, Github, LayoutDashboard } from 'lucide-react';
+import { Droplets, Lock, Mail, ArrowRight, Loader2, Github, LayoutDashboard, Eye } from 'lucide-react';
 import { motion } from 'motion/react';
+import { incrementPageView, getPageViewCount } from '../services/statsService';
 
 interface LoginProps {
   onSharedAccess?: (combinedCode: string) => void;
@@ -11,6 +12,7 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shareCode, setShareCode] = useState('');
+  const [viewCount, setViewCount] = useState<number | null>(null);
 
   // Clear URL error parameters on load
   React.useEffect(() => {
@@ -21,6 +23,14 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
       // Clean the URL without refreshing
       window.history.replaceState({}, document.title, window.location.pathname);
     }
+
+    // Track page view
+    const trackView = async () => {
+      await incrementPageView('home');
+      const count = await getPageViewCount('home');
+      setViewCount(count);
+    };
+    trackView();
   }, []);
 
 
@@ -175,6 +185,20 @@ export const Login: React.FC<LoginProps> = ({ onSharedAccess }) => {
           <p className="text-[10px] text-center text-maroon-300/50 px-4 mt-6">
             By signing in, you agree to the Liceo Moisture Detection System terms of service and privacy policy.
           </p>
+
+          {viewCount !== null && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="flex items-center justify-center gap-2 mt-4 text-maroon-300/40"
+            >
+              <Eye size={12} className="text-gold-500/30" />
+              <span className="text-[10px] font-bold tracking-wider uppercase">
+                {viewCount.toLocaleString()} visitors have viewed this system
+              </span>
+            </motion.div>
+          )}
         </div>
         
         {/* Footer content */}

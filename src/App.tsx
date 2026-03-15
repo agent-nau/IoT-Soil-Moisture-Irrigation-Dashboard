@@ -12,8 +12,6 @@ import type { User } from '@supabase/supabase-js';
 import { motion, AnimatePresence } from 'motion/react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
 
-const DEFAULT_SHEET_ID = '1-X_your_sheet_id_here';
-
 import { Dashboard } from './components/Dashboard';
 import { Privacy } from './components/Privacy';
 
