@@ -40,7 +40,7 @@ function AppContent() {
   const [tempName, setTempName] = useState('');
   const navigate = useNavigate();
 
-  const sheetId = customSheetId || import.meta.env.VITE_GOOGLE_SHEET_ID || DEFAULT_SHEET_ID;
+  const sheetId = customSheetId;
 
   const loadData = useCallback(async (forcedId?: string) => {
     setLoading(true);
@@ -183,6 +183,29 @@ function AppContent() {
       setMonitorName(name);
       localStorage.setItem('monitor_name', name);
       setIsEditingName(false);
+    }
+  };
+
+  const handleRemoveSensor = async () => {
+    try {
+      if (user) {
+        const { error } = await supabase.auth.updateUser({
+          data: { custom_sheet_id: null }
+        });
+        if (error) throw error;
+      }
+      
+      localStorage.removeItem('customSheetId');
+      setCustomSheetId(null);
+      setSensors([]);
+      setSelectedSensorId(null);
+      setError(null);
+    } catch (err) {
+      console.error('Error removing sensor:', err);
+      localStorage.removeItem('customSheetId');
+      setCustomSheetId(null);
+      setSensors([]);
+      setSelectedSensorId(null);
     }
   };
 
@@ -406,6 +429,7 @@ function AppContent() {
               error={error}
               lastRefresh={lastRefresh}
               setIsSetupOpen={setIsSetupOpen}
+              onRemoveSensor={handleRemoveSensor}
               user={user}
             />
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Droplets, Waves, Copy, Check, Sparkles } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Droplets, Waves, Copy, Check, Sparkles, Trash2 } from 'lucide-react';
 import { SensorData } from '../types';
 import { SensorCard } from './SensorCard';
 import { MoistureChart } from './MoistureChart';
@@ -13,6 +13,7 @@ interface DashboardProps {
   error: string | null;
   lastRefresh: Date;
   setIsSetupOpen: (open: boolean) => void;
+  onRemoveSensor?: () => void;
   user: any;
 }
 
@@ -24,7 +25,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   error,
   lastRefresh,
   setIsSetupOpen,
-  user
+  user,
+  onRemoveSensor
 }) => {
   const [copied, setCopied] = React.useState(false);
   const [customName, setCustomName] = React.useState('');
@@ -189,9 +191,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                     </div>
                   </div>
-                    <div className="px-4 py-2 bg-maroon-900/40 rounded-xl text-xs font-medium text-maroon-200 flex items-center gap-2 border border-maroon-800/30">
-                      <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
-                      {selectedSensor.lastUpdated ? `Updated ${lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Waiting for data...'}
+                    <div className="flex items-center gap-2">
+                      <div className="px-4 py-2 bg-maroon-900/40 rounded-xl text-xs font-medium text-maroon-200 flex items-center gap-2 border border-maroon-800/30">
+                        <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+                        {selectedSensor.lastUpdated ? `Updated ${lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Waiting for data...'}
+                      </div>
+                      {onRemoveSensor && (
+                        <button 
+                          onClick={onRemoveSensor}
+                          className="p-2 text-maroon-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
+                          title="Remove Sensor"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </div>
                 </div>
 
