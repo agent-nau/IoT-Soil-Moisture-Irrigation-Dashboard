@@ -33,7 +33,7 @@ export const MoistureChart: React.FC<MoistureChartProps> = ({ readings }) => {
   const isPlaceholder = readings.length === 0;
 
   return (
-    <div className="h-[300px] w-full mt-4">
+    <div className="h-[300px] w-full mt-4 outline-none">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={chartData}>
           <defs>

@@ -219,15 +219,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     ) : (
                       <div className="flex items-center gap-2 group mb-1">
                         <h2 className="text-2xl font-bold text-white">{selectedSensor.name}</h2>
-                        <button 
-                          onClick={() => {
-                            setTempSensorName(selectedSensor.name);
-                            setIsEditingSensorName(true);
-                          }}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-maroon-400 hover:text-gold-400"
-                        >
-                          <Edit2 size={16} />
-                        </button>
+                        {user && (
+                          <button 
+                            onClick={() => {
+                              setTempSensorName(selectedSensor.name);
+                              setIsEditingSensorName(true);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-maroon-400 hover:text-gold-400"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                        )}
                       </div>
                     )}
                     {user && (
@@ -263,7 +265,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
                         {selectedSensor.lastUpdated ? `Updated ${lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Waiting for data...'}
                       </div>
-                      {onEditSensor && (
+                      {onEditSensor && user && (
                         <button 
                           onClick={onEditSensor}
                           className="p-2 text-maroon-400 hover:text-gold-400 hover:bg-gold-500/10 rounded-xl transition-all border border-transparent hover:border-gold-500/20"
