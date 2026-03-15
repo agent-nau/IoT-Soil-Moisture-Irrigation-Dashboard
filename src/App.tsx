@@ -101,7 +101,7 @@ function AppContent() {
         // Create a placeholder sensor if we have an explicitly added sheet ID but no readings yet
         sensorData = [{
           id: customSheetId.length > 15 ? 'Sensor Code' : customSheetId,
-          name: 'Soil Moisture Detector',
+          name: sensorName,
           readings: [],
           currentValue: null,
           lastUpdated: null,
