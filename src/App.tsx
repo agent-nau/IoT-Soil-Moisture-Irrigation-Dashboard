@@ -232,9 +232,11 @@ function AppContent() {
       
       localStorage.setItem('sensor_name', name);
       setSensorName(name);
+      // Immediately update local sensors state to reflect name change
       setSensors(prev => prev.map(s => ({ ...s, name })));
     } catch (err) {
       console.error('Error renaming sensor:', err);
+      // Fallback to local storage if supabase fails
       localStorage.setItem('sensor_name', name);
       setSensorName(name);
       setSensors(prev => prev.map(s => ({ ...s, name })));
