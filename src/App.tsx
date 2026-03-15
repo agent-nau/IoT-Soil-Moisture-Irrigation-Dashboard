@@ -35,6 +35,7 @@ function AppContent() {
   });
   const [monitorName, setMonitorName] = useState<string | null>(localStorage.getItem('monitor_name'));
   const [customSheetId, setCustomSheetId] = useState<string | null>(localStorage.getItem('customSheetId'));
+  const [rawSheetUrl, setRawSheetUrl] = useState<string | null>(localStorage.getItem('rawSheetUrl'));
   const [isSetupOpen, setIsSetupOpen] = useState(false);
   const [setupMode, setSetupMode] = useState<'add' | 'edit'>('add');
   const [sensorName, setSensorName] = useState<string>(localStorage.getItem('sensor_name') || 'Soil Moisture Detector');
@@ -194,20 +195,27 @@ function AppContent() {
     try {
       if (user) {
         const { error } = await supabase.auth.updateUser({
-          data: { custom_sheet_id: null }
+          data: { 
+            custom_sheet_id: null,
+            raw_sheet_url: null
+          }
         });
         if (error) throw error;
       }
       
       localStorage.removeItem('customSheetId');
+      localStorage.removeItem('rawSheetUrl');
       setCustomSheetId(null);
+      setRawSheetUrl(null);
       setSensors([]);
       setSelectedSensorId(null);
       setError(null);
     } catch (err) {
       console.error('Error removing sensor:', err);
       localStorage.removeItem('customSheetId');
+      localStorage.removeItem('rawSheetUrl');
       setCustomSheetId(null);
+      setRawSheetUrl(null);
       setSensors([]);
       setSelectedSensorId(null);
     }
@@ -233,24 +241,31 @@ function AppContent() {
     }
   };
 
-  const handleAddSensor = async (id: string) => {
+  const handleAddSensor = async (id: string, rawUrl: string) => {
     setLoading(true);
     try {
       if (user) {
         const { error } = await supabase.auth.updateUser({
-          data: { custom_sheet_id: id }
+          data: { 
+            custom_sheet_id: id,
+            raw_sheet_url: rawUrl
+          }
         });
         if (error) throw error;
       }
       
       localStorage.setItem('customSheetId', id);
+      localStorage.setItem('rawSheetUrl', rawUrl);
       setCustomSheetId(id);
+      setRawSheetUrl(rawUrl);
       setSelectedSensorId(null); // Reset selection to force auto-select of new sensor
       await loadData(id);
     } catch (err) {
       console.error('Error saving sheet ID:', err);
       localStorage.setItem('customSheetId', id);
+      localStorage.setItem('rawSheetUrl', rawUrl);
       setCustomSheetId(id);
+      setRawSheetUrl(rawUrl);
       await loadData(id);
     }
   };
@@ -351,7 +366,7 @@ function AppContent() {
                 user={user} 
                 isRequired={false}
                 mode={setupMode}
-                initialSheetId={customSheetId || ''}
+                initialSheetId={rawSheetUrl || ''}
               />
               
               <header className="sticky top-0 z-10 bg-maroon-900/80 backdrop-blur-md border-b border-maroon-800/50">

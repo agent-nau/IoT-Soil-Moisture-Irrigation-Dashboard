@@ -5,7 +5,7 @@ import { motion } from 'motion/react';
 interface SetupModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddSensor?: (sheetId: string) => void;
+  onAddSensor?: (sheetId: string, rawUrl: string) => void;
   user: any;
   isRequired?: boolean;
   mode?: 'add' | 'edit';
@@ -59,7 +59,7 @@ export const SetupModal: React.FC<SetupModalProps> = ({
               // Extract ID if full URL is pasted
               const matches = sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
               const id = matches ? matches[1] : sheetUrl;
-              onAddSensor(id);
+              onAddSensor(id, sheetUrl);
               setSheetUrl('');
               onClose();
             }
