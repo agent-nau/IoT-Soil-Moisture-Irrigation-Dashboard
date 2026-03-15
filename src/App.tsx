@@ -31,7 +31,15 @@ function AppContent() {
   });
   const [sharedMonitorName, setSharedMonitorName] = useState<string | null>(() => {
     const raw = localStorage.getItem('sharedSensorId');
-    return raw?.includes(':') ? raw.split(':')[1] : localStorage.getItem('sharedMonitorName');
+    if (!raw?.includes(':')) return localStorage.getItem('sharedMonitorName');
+    const parts = raw.split(':');
+    return parts.length >= 2 ? parts[1] : null;
+  });
+  const [sharedSensorName, setSharedSensorName] = useState<string | null>(() => {
+    const raw = localStorage.getItem('sharedSensorId');
+    if (!raw?.includes(':')) return null;
+    const parts = raw.split(':');
+    return parts.length >= 3 ? parts[2] : null;
   });
   const [monitorName, setMonitorName] = useState<string | null>(localStorage.getItem('monitor_name'));
   const [customSheetId, setCustomSheetId] = useState<string | null>(localStorage.getItem('customSheetId'));
@@ -97,6 +105,17 @@ function AppContent() {
             signal: 60 + Math.floor(Math.random() * 40),
           };
         }).slice(0, 1);
+      } else if (sharedSensorId) {
+        // Show the shared sensor even if it has no readings yet
+        sensorData = [{
+          id: sharedSensorId,
+          name: sharedSensorName || 'Shared Sensor',
+          readings: [],
+          currentValue: null,
+          lastUpdated: null,
+          battery: null,
+          signal: null,
+        }];
       } else if (customSheetId && customSheetId !== '1-X_your_sheet_id_here') {
         // Create a placeholder sensor if we have an explicitly added sheet ID but no readings yet
         sensorData = [{
@@ -281,6 +300,7 @@ function AppContent() {
     setCustomSheetId(null);
     setSharedSensorId(null);
     setSharedMonitorName(null);
+    setSharedSensorName(null);
     await supabase.auth.signOut();
   };
 
@@ -302,11 +322,16 @@ function AppContent() {
             <Navigate to="/dashboard" replace />
           ) : (
             <Login onSharedAccess={(combinedCode) => {
-              const [id, name] = combinedCode.includes(':') ? combinedCode.split(':') : [combinedCode, ''];
+              const parts = combinedCode.split(':');
+              const id = parts[0];
+              const monName = parts[1] || 'Guest Monitor';
+              const sensName = parts[2] || 'Shared Sensor';
+              
               setSharedSensorId(id);
-              setSharedMonitorName(name || 'Guest Monitor');
+              setSharedMonitorName(monName);
+              setSharedSensorName(sensName);
+              
               localStorage.setItem('sharedSensorId', combinedCode);
-              if (name) localStorage.setItem('sharedMonitorName', name);
               navigate('/dashboard');
             }} />
           )
