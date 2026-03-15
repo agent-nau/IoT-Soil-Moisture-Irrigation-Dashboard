@@ -232,23 +232,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         )}
                       </div>
                     )}
-                    {user && (
-                      <div className="mt-2 flex items-center gap-2 group">
-                        <div className="bg-maroon-900/40 rounded-xl px-3 py-1.5 border border-maroon-800/30 flex items-center gap-2">
-                          <code className="text-[10px] font-mono text-gold-400 select-all tracking-tight capitalize">
-                            {selectedSensor.id}:{getAccountName()}:{selectedSensor.name}
-                          </code>
-                          <button 
-                            onClick={handleCopyCode}
-                            className="p-1 text-maroon-400 hover:text-gold-400 transition-colors"
-                            title="Copy Share Code"
-                          >
-                            {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
-                          </button>
-                        </div>
-                        <span className="text-[10px] text-maroon-400 font-medium uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Share Code</span>
-                      </div>
-                    )}
                     <div className="flex items-center gap-3 text-sm text-maroon-200/70">
                       <div className="flex items-center gap-1">
                         <Signal size={14} className={selectedSensor.signal !== null ? 'text-emerald-400' : 'text-maroon-300/20'} />
