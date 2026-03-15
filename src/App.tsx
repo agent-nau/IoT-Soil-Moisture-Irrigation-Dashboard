@@ -137,7 +137,7 @@ function AppContent() {
       setLoading(false);
       setLastRefresh(new Date());
     }
-  }, [sheetId, selectedSensorId, sharedSensorId]);
+  }, [sheetId, selectedSensorId, sharedSensorId, sensorName]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
