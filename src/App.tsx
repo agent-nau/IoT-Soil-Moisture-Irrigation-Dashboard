@@ -89,8 +89,28 @@ function AppContent() {
             signal: 60 + Math.floor(Math.random() * 40),
           };
         }).slice(0, 1);
-      } else {
-        sensorData = [];
+      } else if (currentSheetId && currentSheetId !== '1-X_your_sheet_id_here') {
+        // Create a placeholder sensor if we have a sheet ID but no readings yet
+        sensorData = [{
+          id: currentSheetId.length > 15 ? 'Default Sensor' : currentSheetId,
+          name: 'Soil Moisture Detector',
+          readings: [],
+          currentValue: null,
+          lastUpdated: null,
+          battery: null,
+          signal: null,
+        }];
+      } else if (sharedSensorId) {
+        // Create a placeholder for shared sensor if no readings found
+        sensorData = [{
+          id: sharedSensorId,
+          name: sharedMonitorName || 'Shared Sensor',
+          readings: [],
+          currentValue: null,
+          lastUpdated: null,
+          battery: null,
+          signal: null,
+        }];
       }
 
       setSensors(sensorData);

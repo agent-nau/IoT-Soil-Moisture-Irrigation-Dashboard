@@ -212,26 +212,26 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <p className="text-xs text-maroon-300 font-semibold uppercase tracking-wider mb-1">Moisture</p>
                     <div className="flex items-center gap-2">
                        <Droplets size={18} className="text-gold-400" />
-                       <p className="text-2xl font-bold text-gold-400">{selectedSensor.currentValue !== null ? `${selectedSensor.currentValue}%` : '40%'}</p>
+                       <p className="text-2xl font-bold text-gold-400">{selectedSensor.currentValue !== null ? `${selectedSensor.currentValue}%` : 'N/A'}</p>
                     </div>
                   </div>
                   <div className="p-4 bg-maroon-900/40 rounded-2xl border border-maroon-800/30">
                     <p className="text-xs text-maroon-400 font-semibold uppercase tracking-wider mb-1">Temperature</p>
                     <div className="flex items-center gap-1">
                       <Thermometer size={18} className="text-maroon-400" />
-                      <p className="text-2xl font-bold text-maroon-200">24°C</p>
+                      <p className="text-2xl font-bold text-maroon-200">{selectedSensor.currentValue !== null ? '24°C' : 'N/A'}</p>
                     </div>
                   </div>
                   <div className="p-4 bg-maroon-900/40 rounded-2xl border border-maroon-800/30">
                     <p className="text-xs text-maroon-400 font-semibold uppercase tracking-wider mb-1">Water Threshold</p>
                     <div className="flex items-center gap-1">
                       <Waves size={18} className="text-maroon-400" />
-                      <p className="text-2xl font-bold text-maroon-200">20L</p>
+                      <p className="text-2xl font-bold text-maroon-200">{selectedSensor.currentValue !== null ? '20L' : 'N/A'}</p>
                     </div>
                   </div>
                   <div className="p-4 bg-maroon-900/40 rounded-2xl border border-maroon-800/30">
                     <p className="text-xs text-maroon-400 font-semibold uppercase tracking-wider mb-1">Status</p>
-                    <p className="text-2xl font-bold text-emerald-400">Normal</p>
+                    <p className="text-2xl font-bold text-emerald-400">{selectedSensor.currentValue !== null ? 'Normal' : 'N/A'}</p>
                   </div>
                 </div>
 

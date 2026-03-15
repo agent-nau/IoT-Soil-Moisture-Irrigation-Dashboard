@@ -92,7 +92,7 @@ export const Privacy: React.FC = () => {
       </main>
 
       <footer className="max-w-5xl mx-auto px-4 py-12 border-t border-maroon-900/50 mt-12 text-center text-xs text-maroon-400 font-bold uppercase tracking-widest">
-        © 2026 LDCU Soil Moisture Detection System • Secure & Private
+        © 2026 LDCU Soil Moisture333 Detection System • Secure & Private
       </footer>
     </div>
   );
