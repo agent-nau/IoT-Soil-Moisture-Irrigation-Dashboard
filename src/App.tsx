@@ -58,9 +58,14 @@ function AppContent() {
       // Fetch from Supabase Database
       supabaseReadings = await fetchSupabaseData();
 
-      // Filter by shared sensor if in guest mode
-      if (sharedSensorId && supabaseReadings.length > 0) {
+      // Filter by custom sheet ID or shared sensor if specified
+      if (customSheetId) {
+        supabaseReadings = supabaseReadings.filter(r => r.sensorId === customSheetId);
+      } else if (sharedSensorId) {
         supabaseReadings = supabaseReadings.filter(r => r.sensorId === sharedSensorId);
+      } else {
+        // If neither is set, we don't show random sensors from Supabase
+        supabaseReadings = [];
       }
 
       // Merge and deduplicate readings
@@ -89,22 +94,11 @@ function AppContent() {
             signal: 60 + Math.floor(Math.random() * 40),
           };
         }).slice(0, 1);
-      } else if (currentSheetId && currentSheetId !== '1-X_your_sheet_id_here') {
-        // Create a placeholder sensor if we have a sheet ID but no readings yet
+      } else if (customSheetId && customSheetId !== '1-X_your_sheet_id_here') {
+        // Create a placeholder sensor if we have an explicitly added sheet ID but no readings yet
         sensorData = [{
-          id: currentSheetId.length > 15 ? 'Default Sensor' : currentSheetId,
+          id: customSheetId.length > 15 ? 'Sensor Code' : customSheetId,
           name: 'Soil Moisture Detector',
-          readings: [],
-          currentValue: null,
-          lastUpdated: null,
-          battery: null,
-          signal: null,
-        }];
-      } else if (sharedSensorId) {
-        // Create a placeholder for shared sensor if no readings found
-        sensorData = [{
-          id: sharedSensorId,
-          name: sharedMonitorName || 'Shared Sensor',
           readings: [],
           currentValue: null,
           lastUpdated: null,
