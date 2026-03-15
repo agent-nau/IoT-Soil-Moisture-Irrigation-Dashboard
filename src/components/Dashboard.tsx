@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Droplets, Waves, Copy, Check, Sparkles, Trash2, Settings, Edit2, Share2 } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Plus, Signal, Battery, Thermometer, Droplets, Waves, Copy, Check, Sparkles, Trash2, Settings, Edit2 } from 'lucide-react';
 import { SensorData } from '../types';
 import { SensorCard } from './SensorCard';
 import { MoistureChart } from './MoistureChart';
@@ -230,6 +230,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         </button>
                       </div>
                     )}
+                    {user && (
+                      <div className="mt-2 flex items-center gap-2 group">
+                        <div className="bg-maroon-900/40 rounded-xl px-3 py-1.5 border border-maroon-800/30 flex items-center gap-2">
+                          <code className="text-[10px] font-mono text-gold-400 select-all tracking-tight capitalize">
+                            {selectedSensor.id}:{getAccountName()}:{selectedSensor.name}
+                          </code>
+                          <button 
+                            onClick={handleCopyCode}
+                            className="p-1 text-maroon-400 hover:text-gold-400 transition-colors"
+                            title="Copy Share Code"
+                          >
+                            {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+                          </button>
+                        </div>
+                        <span className="text-[10px] text-maroon-400 font-medium uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Share Code</span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-3 text-sm text-maroon-200/70">
                       <div className="flex items-center gap-1">
                         <Signal size={14} className={selectedSensor.signal !== null ? 'text-emerald-400' : 'text-maroon-300/20'} />
@@ -255,24 +272,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           <Settings size={18} />
                         </button>
                       )}
-                      {user && (
-                        <button 
-                          onClick={handleCopyCode}
-                          className="p-2 text-maroon-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all border border-transparent hover:border-emerald-500/20"
-                          title="Share Sensor"
-                        >
-                          {copied ? <Check size={18} className="text-emerald-400" /> : <Share2 size={18} />}
-                        </button>
-                      )}
-                      {onRemoveSensor && (
-                        <button 
-                          onClick={onRemoveSensor}
-                          className="p-2 text-maroon-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
-                          title="Remove Sensor"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      )}
+                       {onRemoveSensor && (
+                         <button 
+                           onClick={onRemoveSensor}
+                           className="p-2 text-maroon-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"
+                           title="Remove Sensor"
+                         >
+                           <Trash2 size={18} />
+                         </button>
+                       )}
                     </div>
                 </div>
 
