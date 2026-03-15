@@ -189,22 +189,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <div className="flex items-center gap-1 bg-maroon-900/40 rounded-xl px-2 py-1.5 border border-maroon-800/30 group">
-                      <code className="text-xs font-mono text-gold-400 px-2 select-all uppercase tracking-tight">{selectedSensor.id}</code>
-                      <button 
-                        onClick={handleCopyCode}
-                        className="p-1.5 text-maroon-400 hover:text-gold-400 transition-colors rounded-lg hover:bg-gold-500/10"
-                        title="Copy Share Code"
-                      >
-                        {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-                      </button>
-                    </div>
                     <div className="px-4 py-2 bg-maroon-900/40 rounded-xl text-xs font-medium text-maroon-200 flex items-center gap-2 border border-maroon-800/30">
                       <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
                       {selectedSensor.lastUpdated ? `Updated ${lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Waiting for data...'}
                     </div>
-                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -235,20 +223,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                 </div>
 
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4">
                   <h3 className="text-sm font-bold text-gold-50">Moisture Trend</h3>
-                  <div className="flex gap-2">
-                    {['1H', '6H', '24H', '7D'].map(range => (
-                      <button 
-                        key={range}
-                        className={`px-3 py-1 text-[10px] font-bold rounded-lg transition-colors ${
-                          range === '24H' ? 'bg-gold-500 text-maroon-950' : 'text-maroon-300 hover:bg-maroon-900/50'
-                        }`}
-                      >
-                        {range}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
                 <MoistureChart readings={selectedSensor.readings} />

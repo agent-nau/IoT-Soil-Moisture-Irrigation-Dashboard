@@ -18,19 +18,19 @@ interface MoistureChartProps {
 }
 
 export const MoistureChart: React.FC<MoistureChartProps> = ({ readings }) => {
-  const chartData = readings.map(r => ({
-    time: format(r.timestamp, 'HH:mm'),
-    fullTime: format(r.timestamp, 'MMM d, HH:mm:ss'),
-    value: r.value,
-  }));
+  const chartData = readings.length > 0 
+    ? readings.map(r => ({
+        time: format(r.timestamp, 'HH:mm'),
+        fullTime: format(r.timestamp, 'MMM d, HH:mm:ss'),
+        value: r.value,
+      }))
+    : Array.from({ length: 7 }).map((_, i) => ({
+        time: '--:--',
+        fullTime: 'No Data',
+        value: 0,
+      }));
 
-  if (readings.length === 0) {
-    return (
-      <div className="h-[300px] w-full flex items-center justify-center text-maroon-300/20 font-medium italic">
-        No historical data available yet
-      </div>
-    );
-  }
+  const isPlaceholder = readings.length === 0;
 
   return (
     <div className="h-[300px] w-full mt-4">
@@ -74,6 +74,7 @@ export const MoistureChart: React.FC<MoistureChartProps> = ({ readings }) => {
             dataKey="value" 
             stroke="#fbbf24" 
             strokeWidth={2}
+            strokeDasharray={isPlaceholder ? "5 5" : "0"}
             fillOpacity={1} 
             fill="url(#colorValue)" 
             animationDuration={1000}

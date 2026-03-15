@@ -105,6 +105,17 @@ function AppContent() {
           battery: null,
           signal: null,
         }];
+      } else if (sharedSensorId) {
+        // Show the shared sensor even if it has no readings yet
+        sensorData = [{
+          id: sharedSensorId,
+          name: sharedMonitorName || 'Guest Monitor',
+          readings: [],
+          currentValue: null,
+          lastUpdated: null,
+          battery: null,
+          signal: null,
+        }];
       }
 
       setSensors(sensorData);
@@ -112,6 +123,8 @@ function AppContent() {
       // If we are forcing a new ID or don't have a selection, pick the first one
       if ((forcedId || !selectedSensorId) && sensorData.length > 0) {
         setSelectedSensorId(sensorData[0].id);
+      } else if (sensorData.length === 0) {
+        setSelectedSensorId(null);
       }
       setError(null);
     } catch (err) {
