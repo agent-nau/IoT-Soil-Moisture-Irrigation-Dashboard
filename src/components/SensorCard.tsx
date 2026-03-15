@@ -38,7 +38,14 @@ export const SensorCard: React.FC<SensorCardProps> = ({ data, isActive, onClick 
           <div className={`p-2 rounded-xl ${isActive ? 'bg-gold-500/20 text-gold-400' : 'bg-maroon-900/30 text-maroon-400'}`}>
             <Droplets size={18} />
           </div>
-          <span className={`font-medium ${isActive ? 'text-white' : 'text-maroon-100'}`}>{data.name}</span>
+          <div className="flex flex-col">
+            {data.monitorName && (
+              <span className="text-[10px] text-maroon-400 font-bold uppercase tracking-wider leading-none mb-1">
+                {data.monitorName}
+              </span>
+            )}
+            <span className={`font-medium ${isActive ? 'text-white' : 'text-maroon-100'}`}>{data.name}</span>
+          </div>
         </div>
         <span className={`text-2xl font-bold ${getStatusColor(data.currentValue)}`}>
           {data.currentValue !== null ? `${data.currentValue}%` : 'N/A'}

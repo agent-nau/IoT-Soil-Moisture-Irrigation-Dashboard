@@ -12,4 +12,5 @@ export interface SensorData {
   lastUpdated: Date | null;
   battery: number | null;
   signal: number | null;
+  monitorName?: string;
 }

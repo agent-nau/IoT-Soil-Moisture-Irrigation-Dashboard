@@ -217,19 +217,26 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         </button>
                       </form>
                     ) : (
-                      <div className="flex items-center gap-2 group mb-1">
-                        <h2 className="text-2xl font-bold text-white">{selectedSensor.name}</h2>
-                        {user && (
-                          <button 
-                            onClick={() => {
-                              setTempSensorName(selectedSensor.name);
-                              setIsEditingSensorName(true);
-                            }}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-maroon-400 hover:text-gold-400"
-                          >
-                            <Edit2 size={16} />
-                          </button>
+                      <div className="flex flex-col mb-1">
+                        {selectedSensor.monitorName && (
+                          <span className="text-[10px] text-maroon-300 font-bold uppercase tracking-widest mb-1 opacity-70">
+                            {selectedSensor.monitorName}
+                          </span>
                         )}
+                        <div className="flex items-center gap-2 group">
+                          <h2 className="text-2xl font-bold text-white">{selectedSensor.name}</h2>
+                          {user && (
+                            <button 
+                              onClick={() => {
+                                setTempSensorName(selectedSensor.name);
+                                setIsEditingSensorName(true);
+                              }}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-maroon-400 hover:text-gold-400"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     )}
                     <div className="flex items-center gap-3 text-sm text-maroon-200/70">
@@ -257,7 +264,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           <Settings size={18} />
                         </button>
                       )}
-                       {onRemoveSensor && (
+                       {onRemoveSensor && user && (
                          <button 
                            onClick={onRemoveSensor}
                            className="p-2 text-maroon-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all border border-transparent hover:border-red-500/20"

@@ -97,12 +97,13 @@ function AppContent() {
           const sorted = [...group].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
           return {
             id,
-            name: sensorName,
+            name: sharedSensorId ? (sharedSensorName || 'Shared Sensor') : sensorName,
             readings: group,
             currentValue: Math.round(sorted[0].value),
             lastUpdated: sorted[0].timestamp,
             battery: 75 + Math.floor(Math.random() * 25),
             signal: 60 + Math.floor(Math.random() * 40),
+            monitorName: sharedSensorId ? (sharedMonitorName || 'Shared Monitor') : (monitorName || 'My Monitor'),
           };
         }).slice(0, 1);
       } else if (sharedSensorId) {
@@ -115,6 +116,7 @@ function AppContent() {
           lastUpdated: null,
           battery: null,
           signal: null,
+          monitorName: sharedMonitorName || 'Shared Monitor',
         }];
       } else if (customSheetId && customSheetId !== '1-X_your_sheet_id_here') {
         // Create a placeholder sensor if we have an explicitly added sheet ID but no readings yet
@@ -126,17 +128,7 @@ function AppContent() {
           lastUpdated: null,
           battery: null,
           signal: null,
-        }];
-      } else if (sharedSensorId) {
-        // Show the shared sensor even if it has no readings yet
-        sensorData = [{
-          id: sharedSensorId,
-          name: sharedMonitorName || 'Guest Monitor',
-          readings: [],
-          currentValue: null,
-          lastUpdated: null,
-          battery: null,
-          signal: null,
+          monitorName: monitorName || 'My Monitor',
         }];
       }
 
@@ -156,7 +148,7 @@ function AppContent() {
       setLoading(false);
       setLastRefresh(new Date());
     }
-  }, [sheetId, selectedSensorId, sharedSensorId, sensorName]);
+  }, [sheetId, selectedSensorId, sharedSensorId, sensorName, sharedSensorName]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
