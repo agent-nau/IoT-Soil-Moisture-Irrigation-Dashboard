@@ -62,7 +62,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
     }
     
     const accountName = getAccountName();
-    setGeneratedCode(`${prefix}-${randomPart}:${accountName}`);
+    const sensorNameStr = customName.trim() || 'Shared Sensor';
+    setGeneratedCode(`${prefix}-${randomPart}:${accountName}:${sensorNameStr}`);
   };
 
   const handleCopyCode = () => {
