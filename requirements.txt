@@ -1,4 +1,0 @@
-requests
-httpagentparser
-fastapi
-uvicorn[standard]
