@@ -16,7 +16,7 @@
 
 ---
 
-## 🚀 Overview
+## Overview
 
 The **LCDU Soil Moisture Detection System** is a professional-grade IoT monitoring solution designed to provide real-time insights into soil conditions. Built with a premium "Glassmorphism" aesthetic, it offers a seamless experience for farmers, gardeners, and researchers to track soil health from anywhere in the world.
 
@@ -31,7 +31,7 @@ The **LCDU Soil Moisture Detection System** is a professional-grade IoT monitori
 - **Data Source:** Google Sheets API (via CSV publishing)
 ---
 
-## 🔒 Privacy & Security
+## Privacy & Security
 
 We take your data seriously. The Liceo system features:
 
