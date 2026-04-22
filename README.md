@@ -1,4 +1,4 @@
-# 🌿 LDCU SoilMoisture Detection System
+# LDCU SoilMoisture Detection System
 
 <div align="center">
   <img src="public/liceo.png" width="120" alt="Liceo Logo" />
@@ -20,44 +20,15 @@
 
 The **LCDU Soil Moisture Detection System** is a professional-grade IoT monitoring solution designed to provide real-time insights into soil conditions. Built with a premium "Glassmorphism" aesthetic, it offers a seamless experience for farmers, gardeners, and researchers to track soil health from anywhere in the world.
 
-### ✨ Key Features
-
-- **💎 Premium UI/UX:** Stunning maroon and gold theme with smooth animations powered by `motion/react`.
-- **📊 Real-time Analytics:** Direct integration with Google Sheets for live sensor data updates.
-- **🔐 Secure Authentication:** Multi-method login using Email/Password or One-Tap Google OAuth.
-- **📱 Fully Responsive:** Optimized for desktops, tablets, and smartphones.
-- **🛰️ Multi-Sensor Support:** Track multiple sensors with signal strength and battery life indicators.
-- **📈 Trend Visualizations:** Interactive charts powered by `Recharts` to visualize moisture trends over time.
-
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend:** React 19, TypeScript, Vite
 - **Styling:** Tailwind CSS (Modern Glassmorphism)
 - **Animations:** Motion (formerly Framer Motion)
 - **Backend/Auth:** Supabase
 - **Data Source:** Google Sheets API (via CSV publishing)
----
-
-## 🛠️ Database Setup
-
-To enable the **Page View Tracking** feature, you need to create the following table in your Supabase SQL Editor:
-
-```sql
-create table site_stats (
-  name text primary key,
-  value text not null,
-  updated_at timestamp with time zone default now()
-);
-
--- Allow public access to view and update counts (Simplified for MVP)
-alter table site_stats enable row level security;
-create policy "Allow public read access" on site_stats for select using (true);
-create policy "Allow public upsert access" on site_stats for insert with check (true);
-create policy "Allow public update access" on site_stats for update using (true);
-```
-
 ---
 
 ## 🔒 Privacy & Security
